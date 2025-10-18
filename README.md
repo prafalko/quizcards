@@ -1,94 +1,79 @@
-# 10x Astro Starter
+# QuizCards
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+A web application that turns public Quizlet flashcard sets into challenging multiple-choice quizzes.
+
+## Table of Contents
+1. [Project Description](#project-description)
+2. [Tech Stack](#tech-stack)
+3. [Getting Started Locally](#getting-started-locally)
+4. [Available Scripts](#available-scripts)
+5. [Project Scope](#project-scope)
+6. [Project Status](#project-status)
+7. [License](#license)
+
+## Project Description
+QuizCards solves the common problem of poorly-generated distractors in Quizlet’s built-in quiz mode.  
+Given a link to any *public* Quizlet set, the app imports the flashcards and uses AI to generate three context-appropriate incorrect answers for every card, keeping the quiz both fair and instructive.  
+Users can create an account, manage generated quizzes (edit, delete, regenerate answers) and complete quizzes with a clean single-question interface.
 
 ## Tech Stack
+• **Frontend**: Astro 5, React 19, TypeScript 5, Tailwind CSS 4, Shadcn/ui (Radix-based)  
+• **Backend**: Supabase (PostgreSQL, Auth, Storage)  
+• **AI**: Google Gemini via Google AI Studio  
+• **Tooling**: ESLint, Prettier, Husky + lint-staged  
+• **CI/CD**: GitHub Actions  
+• **Hosting**: DigitalOcean (Docker image)  
+• **Node**: v22.14 (see `.nvmrc`)
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
-
-## Prerequisites
-
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
-
-## Getting Started
-
-1. Clone the repository:
-
+## Getting Started Locally
 ```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
+# 1. Clone the repo
+$ git clone https://github.com/yourname/quizcards.git && cd quizcards
+
+# 2. Use the recommended Node version
+$ nvm use   # requires nvm, loads v22.14 from .nvmrc
+
+# 3. Install dependencies
+$ npm install
+
+# 4. Start the dev server
+$ npm run dev
+# → open http://localhost:4321
 ```
 
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Run the development server:
-
-```bash
-npm run dev
-```
-
-4. Build for production:
-
-```bash
-npm run build
-```
+Environment variables (e.g. Supabase keys, Gemini API key) should be placed in a `.env` file – see `.env.example` once available.
 
 ## Available Scripts
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Astro dev server with hot reload |
+| `npm run build` | Build production assets |
+| `npm run preview` | Preview production build locally |
+| `npm run astro` | Access Astro CLI directly |
+| `npm run lint` | Run ESLint over the codebase |
+| `npm run lint:fix` | Run ESLint with `--fix` |
+| `npm run format` | Format code with Prettier |
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+## Project Scope
+Minimum Viable Product (MVP):
+- User authentication (register, login, logout)
+- Import public Quizlet sets by URL
+- AI-powered quiz generation (1 correct + 3 plausible incorrect answers)
+- Quiz management: list, rename, delete
+- Question management: edit, delete, regenerate distractors
+- Quiz-taking interface: one question at a time, random order
+- Result summary with percentage score and answer breakdown
 
-## Project Structure
+Out-of-scope for MVP:
+- Private Quizlet sets & other import sources (APKG, PDF, etc.)
+- Sharing quizzes between accounts
+- Mobile applications
+- Historical analytics beyond the final score summary
 
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
-```
+## Project Status
+![version](https://img.shields.io/badge/version-0.0.1-blue?style=flat-square)
 
-## AI Development Support
-
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
-
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
-
-### Cursor IDE
-
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
-
-### GitHub Copilot
-
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
-
-### Windsurf
-
-The `.windsurfrules` file contains AI configuration for Windsurf.
-
-## Contributing
-
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
+The project is in active **MVP development** — core features are being built and are not yet production-ready.  Contributions are welcome via Pull Requests.
 
 ## License
-
-MIT
+This project is licensed under the MIT License. See the `LICENSE` file for details.
