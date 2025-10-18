@@ -1,0 +1,1 @@
+Utwórz aplikację HTML + JavaScript + CSS z wykorzystaniem Three.js, która zawiera schemat {zawartość schematu}. Do każdej warstwy dodaj etykiety w języku polskim wyjaśniające znaczenie danych elementów.
