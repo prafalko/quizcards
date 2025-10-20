@@ -159,6 +159,6 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
 Kluczowe metryki sukcesu dla wersji MVP skupiają się na jakości generowanych treści przez AI oraz ich akceptacji przez użytkowników.
 
 - MS-01: Akceptacja pytań generowanych przez AI: Co najmniej 75% pytań wygenerowanych przez AI jest akceptowanych przez użytkownika.
-  - Sposób pomiaru: Pytanie jest uznawane za zaakceptowane, jeśli użytkownik nie dokonał w nim żadnych modyfikacji (edycji treści, usunięcia pytania lub ponownego generowania odpowiedzi) przed pierwszym wyjściem z widoku edycji quizu.
+  - Sposób pomiaru: Pytanie jest uznawane za zaakceptowane, jeśli użytkownik nie dokonał w nim żadnych modyfikacji (edycji treści, usunięcia pytania lub ponownego generowania odpowiedzi) przed pierwszym zaakceptowaniem quizu (tj. w momencie zmiany statusu quizu z draft na published).
 - MS-02: Wykorzystanie AI w tworzeniu quizów: Co najmniej 75% wszystkich pytań w quizach tworzonych przez użytkowników pochodzi z generacji AI (a nie zostało dodanych ręcznie, co jest poza zakresem MVP, ale metryka jest zdefiniowana na przyszłość).
   - Sposób pomiaru: Stosunek liczby pytań wygenerowanych przez AI do całkowitej liczby pytań we wszystkich quizach.
