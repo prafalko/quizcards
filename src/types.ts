@@ -188,3 +188,32 @@ export interface QuestionMetadata {
   prompt: string; // The prompt used to generate incorrect answers
   regenerated_at?: string; // ISO timestamp of last regeneration
 }
+
+// ============================================================================
+// External Service Types (Quizlet, AI)
+// ============================================================================
+
+/**
+ * Quizlet flashcard - represents a single term/definition pair from Quizlet
+ */
+export interface QuizletFlashcard {
+  term: string;
+  definition: string;
+}
+
+/**
+ * Quizlet set - represents a complete set of flashcards from Quizlet
+ */
+export interface QuizletSet {
+  id: string;
+  title: string;
+  flashcards: QuizletFlashcard[];
+}
+
+/**
+ * Quizlet error - error thrown by Quizlet service
+ */
+export interface QuizletError {
+  code: Extract<ErrorCode, "QUIZLET_PRIVATE" | "QUIZLET_NOT_FOUND" | "QUIZLET_EMPTY">;
+  message: string;
+}

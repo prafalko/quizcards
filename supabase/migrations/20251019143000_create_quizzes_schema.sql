@@ -92,15 +92,15 @@ comment on index unique_correct_answer is 'ensures each question has exactly one
 
 -- enable rls on quizzes table
 -- users should only access their own quizzes
-alter table quizzes enable row level security;
+alter table quizzes disable row level security;
 
 -- enable rls on quiz_questions table
 -- users should only access questions from their own quizzes
-alter table quiz_questions enable row level security;
+alter table quiz_questions disable row level security;
 
 -- enable rls on answers table
 -- users should only access answers from questions in their own quizzes
-alter table answers enable row level security;
+alter table answers disable row level security;
 
 -- ============================================================================
 -- rls policies for quizzes table
