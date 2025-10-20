@@ -3,6 +3,7 @@
 ## 1. Lista Tabel
 
 ### 1.1. users
+
 This table is managed by Supabase Auth.
 
 - id: UUID PRIMARY KEY (np. generowany przez pgcrypto)
@@ -12,24 +13,27 @@ This table is managed by Supabase Auth.
 - updated_at: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 
 ### 1.2. quizzes
+
 - id: UUID PRIMARY KEY
 - user_id: UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
-- source_url: TEXT NULL  -- opcjonalny URL źródłowy
-- quizlet_set_id: VARCHAR(255) NULL  -- opcjonalny identyfikator zestawu Quizlet
+- source_url: TEXT NULL -- opcjonalny URL źródłowy
+- quizlet_set_id: VARCHAR(255) NULL -- opcjonalny identyfikator zestawu Quizlet
 - title: VARCHAR(255) NOT NULL
-- status: VARCHAR(50) NOT NULL DEFAULT 'draft'  -- status quizu, np. 'draft' lub 'published'
+- status: VARCHAR(50) NOT NULL DEFAULT 'draft' -- status quizu, np. 'draft' lub 'published'
 - created_at: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 - updated_at: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 
 ### 1.3. quiz_questions
+
 - id: UUID PRIMARY KEY
 - quiz_id: UUID NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE
 - question_text: TEXT NOT NULL CHECK (char_length(question_text) <= 2048)
-- metadata: JSONB NOT NULL CHECK (jsonb_typeof(metadata) = 'object')  -- parametry generacji AI (prompt, model, temperature, seed)
+- metadata: JSONB NOT NULL CHECK (jsonb_typeof(metadata) = 'object') -- parametry generacji AI (prompt, model, temperature, seed)
 - created_at: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 - updated_at: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 
 ### 1.4. answers
+
 - id: UUID PRIMARY KEY
 - question_id: UUID NOT NULL REFERENCES quiz_questions(id) ON DELETE CASCADE
 - answer_text: TEXT NOT NULL CHECK (char_length(answer_text) <= 512)
@@ -58,9 +62,9 @@ Dla tabel związanych z danymi użytkownika (głównie quizzes) zaleca się wdro
 - Włączyć RLS na tabeli quizzes.
 - Stworzyć politykę, która umożliwia użytkownikowi dostęp tylko do quizów, gdzie quizzes.user_id odpowiada identyfikatorowi aktualnie zalogowanego użytkownika. Przykład polityki:
 
-    ALTER TABLE quizzes ENABLE ROW LEVEL SECURITY;
-    CREATE POLICY user_quiz_policy ON quizzes
-      USING (user_id = current_setting('app.current_user_id')::uuid);
+  ALTER TABLE quizzes ENABLE ROW LEVEL SECURITY;
+  CREATE POLICY user_quiz_policy ON quizzes
+  USING (user_id = current_setting('app.current_user_id')::uuid);
 
 Polityki RLS dla quiz_questions i answers mogą być zaimplementowane pośrednio przez połączenie z tabelą quizzes.
 
