@@ -17,31 +17,21 @@ The API is organized around the following main resources that correspond to data
 - **Path:** `/api/quizzes`
 - **Description:** Retrieve all quizzes for the authenticated user, sorted by newest first
 - **Query Parameters:**
-  - `page` (optional, integer, default: 1) - Page number for pagination
-  - `limit` (optional, integer, default: 20, max: 100) - Number of items per page
   - `status` (optional, string) - Filter by quiz status ('draft', 'published')
 - **Success Response (200 OK):**
 ```json
-{
-  "data": [
-    {
-      "id": "uuid",
-      "title": "Biology Flashcards Quiz",
-      "status": "published",
-      "source_url": "https://quizlet.com/...",
-      "quizlet_set_id": "12345",
-      "question_count": 25,
-      "created_at": "2025-01-20T10:00:00Z",
-      "updated_at": "2025-01-20T10:00:00Z"
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "limit": 20,
-    "total": 45,
-    "total_pages": 3
+[
+  {
+    "id": "uuid",
+    "title": "Biology Flashcards Quiz",
+    "status": "published",
+    "source_url": "https://quizlet.com/...",
+    "quizlet_set_id": "12345",
+    "question_count": 25,
+    "created_at": "2025-01-20T10:00:00Z",
+    "updated_at": "2025-01-20T10:00:00Z"
   }
-}
+]
 ```
 - **Error Responses:**
   - 400 Bad Request: Invalid query parameters

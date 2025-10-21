@@ -1,4 +1,4 @@
-import type { QuizletSet, QuizletError } from "../../types";
+import type { QuizletSet, ErrorResponse } from "../../types";
 
 /**
  * Quizlet Service - handles fetching flashcards from Quizlet
@@ -28,7 +28,7 @@ export function extractQuizletSetId(url: string): string {
  *
  * @param setId - Quizlet set ID
  * @returns QuizletSet with flashcards
- * @throws QuizletError for various error conditions
+ * @throws ErrorResponse for various error conditions
  */
 export async function fetchQuizletSet(setId: string): Promise<QuizletSet> {
   // Simulate network delay
@@ -36,25 +36,31 @@ export async function fetchQuizletSet(setId: string): Promise<QuizletSet> {
 
   // Mock different scenarios based on set ID
   if (setId === "999999999") {
-    const error: QuizletError = {
-      code: "QUIZLET_NOT_FOUND",
-      message: "Quizlet set not found",
+    const error: ErrorResponse = {
+      error: {
+        code: "QUIZLET_NOT_FOUND",
+        message: "Quizlet set not found",
+      },
     };
     throw error;
   }
 
   if (setId === "888888888") {
-    const error: QuizletError = {
-      code: "QUIZLET_PRIVATE",
-      message: "This Quizlet set is private",
+    const error: ErrorResponse = {
+      error: {
+        code: "QUIZLET_PRIVATE",
+        message: "This Quizlet set is private",
+      },
     };
     throw error;
   }
 
   if (setId === "777777777") {
-    const error: QuizletError = {
-      code: "QUIZLET_EMPTY",
-      message: "Quizlet set contains no flashcards",
+    const error: ErrorResponse = {
+      error: {
+        code: "QUIZLET_EMPTY",
+        message: "Quizlet set contains no flashcards",
+      },
     };
     throw error;
   }

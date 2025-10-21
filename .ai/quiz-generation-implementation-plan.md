@@ -75,19 +75,19 @@ Endpoint ma za zadanie importowanie fiszek z publicznego zestawu Quizlet na pods
 - **Limity czasowe:** Ustawienie odpowiednich timeoutów dla zewnętrznych połączeń (Quizlet - 10s, AI - 60s).
 
 ## 9. Etapy wdrożenia
-1. **✅ Stworzenie walidatora wejściowego:**  
-   - ✅ Implementacja schematu walidacji dla `CreateQuizCommand` przy użyciu `zod` w `src/lib/validators/quiz.validator.ts`.
-   - ✅ Walidacja URL Quizlet (format, domena, struktura).
-   - ✅ Walidacja opcjonalnego tytułu (min 1, max 200 znaków).
+1. **Stworzenie walidatora wejściowego:**  
+   - Implementacja schematu walidacji dla `CreateQuizCommand` przy użyciu `zod` w `src/lib/validators/quiz.validator.ts`.
+   - Walidacja URL Quizlet (format, domena, struktura).
+   - Walidacja opcjonalnego tytułu (min 1, max 200 znaków).
 
-2. **✅ Obsługa autoryzacji i zabezpieczeń:**  
-   - ✅ Na etapie developmentu użyj stałego `user-id` = "f5c634b6-400f-462e-b7df-d942e33a1d1b".
+2. **Obsługa autoryzacji i zabezpieczeń:**  
+   -  Na etapie developmentu użyj stałego `user-id` = SUPABASE_DEFAULT_USER_ID.
    - W przyszłości, docelowo będziemy pobierać `user_id` z kontekstu autoryzacji i weryfikować użytkownika przed wykonaniem operacji przez Supabase Auth.
 
-3. **✅ Implementacja logiki pobierania fiszek z Quizlet:**  
-   - ✅ Na etapie developmentu stworzymy mocki w `src/lib/services/quizlet.service.ts`.
-   - ✅ Funkcja `extractQuizletSetId()` do ekstrakcji ID z URL.
-   - ✅ Funkcja `fetchQuizletSet()` z mockami dla różnych scenariuszy (not found, private, empty, success).
+3. **Implementacja logiki pobierania fiszek z Quizlet:**  
+   - Na etapie developmentu stworzymy mocki w `src/lib/services/quizlet.service.ts`.
+   - Funkcja `extractQuizletSetId()` do ekstrakcji ID z URL.
+   - Funkcja `fetchQuizletSet()` z mockami dla różnych scenariuszy (not found, private, empty, success).
    - W przyszłości, docelowo będziemy ekstrahować `quizlet_set_id`, pobierać fiszeki przy pomocy scrappera, wraz z obsługą wyjątków (prywatny zestaw, brak danych).
 
 4. **Integracja z usługą AI:** 
@@ -96,7 +96,7 @@ Endpoint ma za zadanie importowanie fiszek z publicznego zestawu Quizlet na pods
 
 5. **Zapis do bazy danych:**  
    - Utworzenie rekordu quizu w tabeli `quizzes` z odpowiednimi danymi.
-   - Ustawienie statusu na `published`.
+   - Ustawienie statusu na `draft`.
 
 6. **Budowa odpowiedzi API:**  
    - Zbudowanie i zwrócenie odpowiedzi z kodem 201 oraz danymi quizu.

@@ -21,7 +21,6 @@ Standardowa funkcja generowania quizów w Quizlet tworzy nieprawidłowe odpowied
 - F-09: Podsumowanie wyników: Po zakończeniu quizu, użytkownikowi musi zostać wyświetlone podsumowanie zawierające wynik procentowy oraz listę wszystkich pytań z zaznaczeniem poprawnych, błędnych oraz udzielonych przez użytkownika odpowiedzi.
 - F-10: Obsługa błędów: System musi informować użytkownika o błędach, np. przy próbie importu prywatnego lub nieistniejącego zestawu fiszek.
 - F-11: Wskaźniki stanu: Aplikacja powinna wyświetlać wskaźnik ładowania podczas procesów wymagających czasu, takich jak generowanie quizu.
-- F-12: Zapisywanie postępu: Postęp rozwiązywania quizu jest zapisywany (np. na wypadek odświeżenia strony).
 
 ## 4. Granice produktu
 
@@ -71,7 +70,8 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - Po wklejeniu linku i zainicjowaniu generowania, aplikacja wyświetla animację ładowania.
   - System poprawnie importuje fiszki i generuje quiz z pytaniami, gdzie każde pytanie ma jedną poprawną i trzy nieprawidłowe odpowiedzi.
   - Domyślna liczba pytań w quizie jest równa liczbie fiszek w zestawie.
-  - Nowo wygenerowany quiz pojawia się na mojej liście quizów.
+  - Nowo wygenerowany quiz ma status szkicu (draft).
+  - Wygenerowany quiz zostaje wyświetlony w widoku edycji.
 
 - ID: US-005
 - Tytuł: Obsługa nieprawidłowego linku Quizlet
@@ -114,6 +114,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - Każde pytanie i odpowiedź można edytować w trybie plain text.
   - W trybie edycji, pierwsza odpowiedź jest zawsze oznaczona jako poprawna.
   - Zmiany muszą zostać zapisane, aby zostały uwzględnione w quizie.
+  - Jeśli quiz ma status szkicu ('draft') to w momencie zapisu quizu status zostaje zmieniony na opublikowany ('published').
 
 - ID: US-010
 - Tytuł: Ponowne generowanie odpowiedzi

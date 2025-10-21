@@ -1,8 +1,8 @@
 import type { APIRoute } from "astro";
 import { ZodError } from "zod";
 
-import type { ErrorResponse, QuizSummaryDTO, QuizletError } from "../../../types";
-import { createQuizSchema } from "../../../lib/validators/quiz.validator";
+import type { CreateQuizCommand, ErrorResponse, QuizSummaryDTO } from "../../../types";
+import { validateRequestData } from "../../../lib/validators/quiz.validator";
 import { extractQuizletSetId, fetchQuizletSet } from "../../../lib/services/quizlet.service";
 import { generateIncorrectAnswers } from "../../../lib/services/ai.service";
 import { supabaseClient } from "../../../db/supabase.client";
@@ -29,10 +29,40 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Step 1: Parse and validate request body
-    const body = await request.json();
-    const validatedData = createQuizSchema.parse(body);
+    let source_url: string;
+    let custom_title: string | undefined;
+    try {
+      const body = await request.json();
+      const validated = validateRequestData.parse(body) as CreateQuizCommand;
+      source_url = validated.source_url;
+      custom_title = validated.title;
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const errorResponse: ErrorResponse = {
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Invalid request data",
+            details: { errors: error.errors },
+          },
+        };
+        return new Response(JSON.stringify(errorResponse), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
 
-    const { source_url, title: customTitle } = validatedData;
+      const errorResponse: ErrorResponse = {
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Failed to parse request data",
+          details: { error: error instanceof Error ? error.message : String(error) },
+        },
+      };
+      return new Response(JSON.stringify(errorResponse), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     // Step 2: Extract Quizlet set ID
     let quizletSetId: string;
@@ -57,52 +87,21 @@ export const POST: APIRoute = async ({ request }) => {
     try {
       quizletSet = await fetchQuizletSet(quizletSetId);
     } catch (error) {
-      const quizletError = error as QuizletError;
+      const quizletError = error as ErrorResponse;
 
-      if (quizletError.code === "QUIZLET_NOT_FOUND") {
-        const errorResponse: ErrorResponse = {
-          error: {
-            code: "QUIZLET_NOT_FOUND",
-            message: "Quizlet set not found",
-            details: { quizlet_set_id: quizletSetId },
-          },
-        };
-        return new Response(JSON.stringify(errorResponse), {
-          status: 404,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
+      // Add quizlet set ID to error details
+      quizletError.error.details = { quizlet_set_id: quizletSetId };
 
-      if (quizletError.code === "QUIZLET_PRIVATE") {
-        const errorResponse: ErrorResponse = {
-          error: {
-            code: "QUIZLET_PRIVATE",
-            message: "This Quizlet set is private",
-            details: { quizlet_set_id: quizletSetId },
-          },
-        };
-        return new Response(JSON.stringify(errorResponse), {
-          status: 403,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
+      // Determine HTTP status based on error code
+      let status = 500;
+      if (quizletError.error.code === "QUIZLET_NOT_FOUND") status = 404;
+      if (quizletError.error.code === "QUIZLET_PRIVATE") status = 403;
+      if (quizletError.error.code === "QUIZLET_EMPTY") status = 422;
 
-      if (quizletError.code === "QUIZLET_EMPTY") {
-        const errorResponse: ErrorResponse = {
-          error: {
-            code: "QUIZLET_EMPTY",
-            message: "Quizlet set contains no flashcards",
-            details: { quizlet_set_id: quizletSetId },
-          },
-        };
-        return new Response(JSON.stringify(errorResponse), {
-          status: 422,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-
-      // Unknown error
-      throw error;
+      return new Response(JSON.stringify(quizletError), {
+        status,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Step 4: Generate incorrect answers using AI (MOCK)
@@ -132,14 +131,14 @@ export const POST: APIRoute = async ({ request }) => {
     const userId = supabaseDefaultUserId; // MOCK: Development user ID
 
     // Use the custom title if provided, otherwise use Quizlet set title
-    const quizTitle = customTitle || quizletSet.title;
+    const quizTitle = custom_title || quizletSet.title;
 
     // Insert quiz
     const { data: quiz, error: quizError } = await supabase
       .from("quizzes")
       .insert({
         title: quizTitle,
-        status: "published",
+        status: "draft",
         source_url,
         quizlet_set_id: quizletSetId,
         user_id: userId,

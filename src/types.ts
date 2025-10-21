@@ -66,22 +66,9 @@ export type QuizSummaryDTO = Omit<Quiz, "user_id"> & {
 };
 
 /**
- * Pagination metadata for list responses
+ * Quizzes list response - returns array of quiz items
  */
-export interface PaginationDTO {
-  page: number;
-  limit: number;
-  total: number;
-  total_pages: number;
-}
-
-/**
- * Quizzes list response - wraps quiz list with pagination
- */
-export interface QuizzesListResponseDTO {
-  data: QuizListItemDTO[];
-  pagination: PaginationDTO;
-}
+export type QuizzesListDTO = QuizListItemDTO[];
 
 // ============================================================================
 // Command Models for API Requests
@@ -168,8 +155,6 @@ export type quiz_status = "draft" | "published";
  * Query parameters for GET /api/quizzes
  */
 export interface QuizzesListQueryParams {
-  page?: number; // Default: 1
-  limit?: number; // Default: 20, max: 100
   status?: quiz_status; // Filter by status ('draft' | 'published')
 }
 
@@ -208,12 +193,4 @@ export interface QuizletSet {
   id: string;
   title: string;
   flashcards: QuizletFlashcard[];
-}
-
-/**
- * Quizlet error - error thrown by Quizlet service
- */
-export interface QuizletError {
-  code: Extract<ErrorCode, "QUIZLET_PRIVATE" | "QUIZLET_NOT_FOUND" | "QUIZLET_EMPTY">;
-  message: string;
 }
