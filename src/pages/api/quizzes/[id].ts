@@ -104,7 +104,7 @@ export const GET: APIRoute = async ({ params, request }) => {
 
     const errorResponse: ErrorResponse = {
       error: {
-        code: "AI_GENERATION_FAILED", // Reusing existing error code for server errors
+        code: "INTERNAL_ERROR",
         message: "An unexpected error occurred while retrieving the quiz",
         details: { correlationId },
       },

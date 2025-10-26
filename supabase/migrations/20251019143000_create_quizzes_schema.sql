@@ -57,13 +57,15 @@ create table answers (
   id uuid primary key default gen_random_uuid(),
   question_id uuid not null references quiz_questions(id) on delete cascade,
   answer_text text not null check (char_length(answer_text) <= 512),
-  is_correct boolean not null default false
+  is_correct boolean not null default false,
+  source varchar(20) not null default 'provided' check (source in ('provided', 'manual', 'ai', 'ai-edited'))
 );
 
 -- add comment explaining the table purpose
 comment on table answers is 'stores answer options for quiz questions (must have exactly 4 answers per question with exactly 1 correct)';
 comment on column answers.answer_text is 'the answer text, max 512 characters';
 comment on column answers.is_correct is 'indicates if this is the correct answer for the question';
+comment on column answers.source is 'origin of the answer: defaults to ''provided'' if is_correct=true, ''ai'' if is_correct=false';
 
 -- ============================================================================
 -- indexes
@@ -298,4 +300,57 @@ create trigger update_quiz_questions_updated_at
   execute function update_updated_at_column();
 
 comment on function update_updated_at_column is 'automatically updates the updated_at timestamp when a record is modified';
+
+-- trigger: update 'updated_at' column in quiz_questions when a related row in 'answers' is modified
+-- this ensures the parent quiz_question's 'updated_at' stays in sync with any changes in its child answers.
+
+create or replace function update_quiz_question_updated_at_from_answers()
+returns trigger as $$
+begin
+  update quiz_questions
+  set updated_at = now()
+  where id = new.question_id;
+  return new;
+end;
+$$ language plpgsql;
+
+-- trigger for answers table: after insert, update, or delete, update parent quiz_question's updated_at
+create trigger answers_touch_quiz_questions_updated_at
+  after insert or update or delete
+  on answers
+  for each row
+  execute function update_quiz_question_updated_at_from_answers();
+
+comment on function update_quiz_question_updated_at_from_answers is 
+  'Updates the updated_at timestamp of quiz_questions when any related answer row is inserted, updated, or deleted. Ensures quiz_questions stays current if answers are changed.';
+
+comment on trigger answers_touch_quiz_questions_updated_at on answers is 
+  'Fires after insert, update, or delete on answers to update the parent quiz_question''s updated_at timestamp.';
+
+
+-- trigger: update 'updated_at' column in quizzes when a related row in 'quiz_questions' is modified
+-- this ensures the parent quizzes's 'updated_at' reflects recent changes to its questions.
+
+create or replace function update_quizzes_updated_at_from_quiz_questions()
+returns trigger as $$
+begin
+  update quizzes
+  set updated_at = now()
+  where id = new.quiz_id;
+  return new;
+end;
+$$ language plpgsql;
+
+-- trigger for quiz_questions table: after update, update parent quizzes's updated_at
+create trigger quiz_questions_touch_quizzes_updated_at
+  after update
+  on quiz_questions
+  for each row
+  execute function update_quizzes_updated_at_from_quiz_questions();
+
+comment on function update_quizzes_updated_at_from_quiz_questions is 
+  'Updates the updated_at timestamp of quizzes when any related quiz_question row is updated. Ensures quizzes stays current if quiz_questions are changed.';
+
+comment on trigger quiz_questions_touch_quizzes_updated_at on quiz_questions is 
+  'Fires after update on quiz_questions to update the parent quizzes'' updated_at timestamp.';
 

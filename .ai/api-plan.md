@@ -120,7 +120,7 @@ The API is organized around the following main resources that correspond to data
   - 403 Forbidden: Quizlet set is private
   - 404 Not Found: Quizlet set does not exist
   - 422 Unprocessable Entity: Quizlet set is empty (no flashcards)
-  - 500 Internal Server Error: AI generation failed
+  - 500 Internal Server Error: AI generation failed or database operation failed
 
 #### Update Quiz
 - **Method:** PATCH
@@ -326,7 +326,7 @@ The API is organized around the following main resources that correspond to data
 ```
 - **Error Responses:**
   - 404 Not Found: Question does not exist
-  - 500 Internal Server Error: AI generation failed
+  - 500 Internal Server Error: AI generation failed or database operation failed
 
 #### Delete Question
 - **Method:** DELETE
@@ -449,6 +449,8 @@ Common error codes:
 - `QUIZLET_NOT_FOUND`: Quizlet set does not exist
 - `QUIZLET_EMPTY`: Quizlet set has no flashcards
 - `AI_GENERATION_FAILED`: AI service error
+- `DATABASE_ERROR`: Database operation failed
+- `INTERNAL_ERROR`: Unexpected server error
 - `RATE_LIMIT_EXCEEDED`: Too many requests
 
 ### 4.6. Success Metrics Tracking

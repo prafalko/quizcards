@@ -86,7 +86,7 @@ export class DatabaseError extends AppError {
   constructor(operation: string, originalError: unknown, correlationId?: string) {
     const errorMessage = originalError instanceof Error ? originalError.message : String(originalError);
     super(
-      "AI_GENERATION_FAILED", // Reusing existing error code for database issues
+      "DATABASE_ERROR",
       `Database operation failed: ${operation}`,
       500,
       {

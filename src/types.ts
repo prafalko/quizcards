@@ -144,6 +144,8 @@ export type ErrorCode =
   | "QUIZLET_NOT_FOUND"
   | "QUIZLET_EMPTY"
   | "AI_GENERATION_FAILED"
+  | "DATABASE_ERROR"
+  | "INTERNAL_ERROR"
   | "RATE_LIMIT_EXCEEDED";
 
 // ============================================================================

@@ -115,10 +115,10 @@ export const POST: APIRoute = async ({ request }) => {
         return {
           question_text: flashcard.term,
           answers: [
-            { answer_text: flashcard.definition, is_correct: true },
-            { answer_text: aiResponse.incorrectAnswers[0], is_correct: false },
-            { answer_text: aiResponse.incorrectAnswers[1], is_correct: false },
-            { answer_text: aiResponse.incorrectAnswers[2], is_correct: false },
+            { answer_text: flashcard.definition, is_correct: true, source: "provided" as const },
+            { answer_text: aiResponse.incorrectAnswers[0], is_correct: false, source: "ai" as const },
+            { answer_text: aiResponse.incorrectAnswers[1], is_correct: false, source: "ai" as const },
+            { answer_text: aiResponse.incorrectAnswers[2], is_correct: false, source: "ai" as const },
           ],
           metadata: aiResponse.metadata,
         };
@@ -150,7 +150,7 @@ export const POST: APIRoute = async ({ request }) => {
       // TODO: Add proper logging service
       const errorResponse: ErrorResponse = {
         error: {
-          code: "AI_GENERATION_FAILED",
+          code: "DATABASE_ERROR",
           message: "Failed to save quiz to database",
           details: { error: quizError?.message },
         },
@@ -180,7 +180,7 @@ export const POST: APIRoute = async ({ request }) => {
 
         const errorResponse: ErrorResponse = {
           error: {
-            code: "AI_GENERATION_FAILED",
+            code: "DATABASE_ERROR",
             message: "Failed to save questions to database",
             details: { error: questionError?.message },
           },
@@ -196,6 +196,7 @@ export const POST: APIRoute = async ({ request }) => {
         question_id: question.id,
         answer_text: answer.answer_text,
         is_correct: answer.is_correct,
+        source: answer.source,
       }));
 
       const { error: answersError } = await supabase.from("answers").insert(answersToInsert);
@@ -207,7 +208,7 @@ export const POST: APIRoute = async ({ request }) => {
 
         const errorResponse: ErrorResponse = {
           error: {
-            code: "AI_GENERATION_FAILED",
+            code: "DATABASE_ERROR",
             message: "Failed to save answers to database",
             details: { error: answersError?.message },
           },
@@ -255,7 +256,7 @@ export const POST: APIRoute = async ({ request }) => {
     // TODO: Add proper logging service
     const errorResponse: ErrorResponse = {
       error: {
-        code: "AI_GENERATION_FAILED",
+        code: "INTERNAL_ERROR",
         message: "An unexpected error occurred",
         details: { error: error instanceof Error ? error.message : String(error) },
       },
