@@ -61,23 +61,7 @@ Environment variables (e.g. Supabase keys, Gemini API key) should be placed in a
 
 ### Manual API Tests
 
-Run manual tests for API endpoints (requires dev server running):
-
-```bash
-# Test quiz generation (POST /api/quizzes/generate)
-npm run test:post:quizzes:generate
-
-# Test listing quizzes (GET /api/quizzes)
-npm run test:get:quizzes
-
-# Test getting quiz by ID (GET /api/quizzes/:id)
-npm run test:get:quizzes:id
-
-# Run all API tests in sequence
-npm run test:api
-```
-
-See [src/test/README.md](src/test/README.md) for detailed testing documentation.
+The project includes manual test scripts for verifying API endpoint functionality during development. See [src/test/README.md](src/test/README.md) for detailed testing instructions and documentation.
 
 ## Project Scope
 
@@ -100,7 +84,7 @@ Out-of-scope for MVP:
 
 ## Project Status
 
-![version](https://img.shields.io/badge/version-0.0.1-blue?style=flat-square)
+![version](https://img.shields.io/badge/version-0.0.2-blue?style=flat-square)
 
 The project is in active **MVP development** — core features are being built and are not yet production-ready. Contributions are welcome via Pull Requests.
 

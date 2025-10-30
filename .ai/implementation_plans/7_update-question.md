@@ -1,9 +1,11 @@
 # API Endpoint Implementation Plan: Update Question Text
 
 ## 1. Przegląd punktu końcowego
+
 Endpoint ma za zadanie aktualizację tekstu dla istniejącego pytania. Umożliwia modyfikację pola `question_text` na podstawie identyfikatora UUID pytania. Operacja jest ograniczona do właściciela quizu, do którego należy dane pytanie, co zapewnia bezpieczeństwo i integralność danych. Po pomyślnej aktualizacji, pole `updated_at` w tabeli `quiz_questions` również zostanie zaktualizowane.
 
 ## 2. Szczegóły żądania
+
 - **Metoda HTTP:** `PATCH`
 - **Ścieżka URL:** `/api/questions/:id`
 - **Parametry:**
@@ -19,11 +21,13 @@ Endpoint ma za zadanie aktualizację tekstu dla istniejącego pytania. Umożliwi
   ```
 
 ## 3. Wykorzystywane typy
+
 - **DTO zdefiniowane w `src/types.ts`:**
   - `UpdateQuestionCommand`: Model polecenia używany do walidacji danych wejściowych z ciała żądania.
   - `QuestionDetailDTO`: Struktura danych zwracana w odpowiedzi po pomyślnej aktualizacji, zawierająca pełne informacje o pytaniu i jego odpowiedziach.
 
 ## 4. Szczegóły odpowiedzi
+
 - **Sukces (200 OK):**
   - Zwraca obiekt `QuestionDetailDTO` zawierający zaktualizowane dane pytania wraz z listą odpowiedzi. Pole `updated_at` zostanie automatycznie zaktualizowane.
   ```json
@@ -43,6 +47,7 @@ Endpoint ma za zadanie aktualizację tekstu dla istniejącego pytania. Umożliwi
   - `500 Internal Server Error`: Błędy serwera, np. problem z połączeniem do bazy danych.
 
 ## 5. Przepływ danych
+
 1. Handler endpointu otrzymuje żądanie `PATCH` z `id` w URL i `question_text` w ciele.
 2. Walidacja parametru `id`, aby upewnić się, że jest to poprawny UUID.
 3. Walidacja ciała żądania przy użyciu dedykowanej schemy Zod.
@@ -55,21 +60,25 @@ Endpoint ma za zadanie aktualizację tekstu dla istniejącego pytania. Umożliwi
 10. Handler endpointu serializuje DTO do formatu JSON i zwraca odpowiedź z kodem statusu 200 OK.
 
 ## 6. Względy bezpieczeństwa
+
 - **Uwierzytelnianie i autoryzacja:** Dostęp do endpointu docelowo będzie wymagał uwierzytelnienia przez Supabase Auth. Na etapie MVP operacje będą wykonywane w kontekście stałego `user_id`.
 - **Zapobieganie IDOR:** Kluczowe jest, aby operacja `UPDATE` w bazie danych zawsze weryfikowała własność zasobu poprzez sprawdzenie `user_id` w powiązanej tabeli `quizzes`.
 - **Walidacja wejścia:** Rygorystyczna walidacja `id` (format UUID) i `question_text` (typ, długość) za pomocą Zod chroni przed niepoprawnymi danymi i potencjalnymi atakami.
 
 ## 7. Obsługa błędów
+
 - **Błędy walidacji (400):** Zostaną przechwycone i obsłużone, zwracając szczegółowe komunikaty o błędach.
 - **Brak zasobu (404):** Jeśli `quizService` nie znajdzie odpowiedniego pytania do aktualizacji, rzuci błąd `NotFoundError`, który zostanie zmapowany na odpowiedź 404.
 - **Błąd serwera (500):** Wszelkie nieoczekiwane błędy (np. błędy bazy danych) zostaną przechwycone, zalogowane przez `LoggerService` i zmapowane na standardową odpowiedź 500.
 
 ## 8. Rozważania dotyczące wydajności
+
 - Operacja `UPDATE` na pojedynczym wierszu jest wysoce wydajna, zwłaszcza przy użyciu indeksu na kluczu głównym (`id`).
 - Zapytanie weryfikujące uprawnienia użytkownika powinno być zoptymalizowane, aby unikać zbędnych złączeń (JOIN).
 - Po aktualizacji, pobranie pełnych danych pytania z odpowiedziami powinno być zrealizowane za pomocą jednego, efektywnego zapytania.
 
 ## 9. Etapy wdrożenia
+
 1. **Rozszerzenie walidatora:**
    - W pliku `src/lib/validators/quiz.validator.ts` dodać nowy schemat Zod (`updateQuestionTextSchema`) do walidacji ciała żądania (`question_text`).
 2. **Implementacja w Quiz Service:**

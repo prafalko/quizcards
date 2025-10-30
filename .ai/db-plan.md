@@ -40,7 +40,6 @@ This table is managed by Supabase Auth.
 - is_correct: BOOLEAN NOT NULL DEFAULT FALSE
 - source: VARCHAR(20) NOT NULL DEFAULT 'provided' CHECK (source in ('provided', 'manual', 'ai', 'ai-edited'))
 
-
 ## 2. Relacje między tabelami
 
 - Jeden użytkownik (users) może mieć wiele quizów (quizzes): relacja jeden-do-wielu (users.id -> quizzes.user_id).

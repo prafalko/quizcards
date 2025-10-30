@@ -1,9 +1,11 @@
 # API Endpoint Implementation Plan: Update Quiz
 
 ## 1. Przegląd punktu końcowego
+
 Endpoint ma za zadanie aktualizację właściwości istniejącego quizu. W obecnej wersji pozwala wyłącznie na zmianę tytułu (`title`) quizu. Operacja jest ograniczona do właściciela danego quizu.
 
 ## 2. Szczegóły żądania
+
 - **Metoda HTTP:** `PATCH`
 - **Ścieżka URL:** `/api/quizzes/:id`
 - **Parametry:**
@@ -19,11 +21,13 @@ Endpoint ma za zadanie aktualizację właściwości istniejącego quizu. W obecn
   ```
 
 ## 3. Wykorzystywane typy
+
 - **DTO zdefiniowane w `src/types.ts`:**
   - `UpdateQuizCommand`: Model polecenia używany do walidacji danych wejściowych z ciała żądania.
   - `QuizSummaryDTO`: Struktura danych zwracana w odpowiedzi po pomyślnej aktualizacji quizu.
 
 ## 4. Szczegóły odpowiedzi
+
 - **Sukces (200 OK):**
   - Zwraca obiekt `QuizSummaryDTO` zawierający zaktualizowane dane quizu. Pole `updated_at` zostanie automatycznie zaktualizowane.
   ```json
@@ -45,6 +49,7 @@ Endpoint ma za zadanie aktualizację właściwości istniejącego quizu. W obecn
   - `500 Internal Server Error`: Błędy serwera, np. problem z połączeniem do bazy danych.
 
 ## 5. Przepływ danych
+
 1. Handler endpointu otrzymuje żądanie `PATCH` z `id` w URL i `title` w ciele.
 2. Walidacja parametru `id` w celu upewnienia się, że jest to poprawny UUID.
 3. Walidacja ciała żądania przy użyciu schemy Zod dla `UpdateQuizCommand`.
@@ -57,21 +62,25 @@ Endpoint ma za zadanie aktualizację właściwości istniejącego quizu. W obecn
 10. Handler endpointu serializuje DTO do formatu JSON i zwraca odpowiedź z kodem statusu 200 OK.
 
 ## 6. Względy bezpieczeństwa
+
 - **Uwierzytelnianie i autoryzacja:** Dostęp do endpointu docelowo będzie wymagał uwierzytelnienia przez Supabase Auth. Na etapie MVP operacje będą wykonywane w kontekście stałego `user_id` (`SUPABASE_DEFAULT_USER_ID`).
 - **Zapobieganie IDOR:** Kluczowe jest, aby operacja `UPDATE` w bazie danych zawsze zawierała warunek `WHERE user_id = :userId`, co gwarantuje, że użytkownicy mogą modyfikować tylko własne zasoby.
 - **Walidacja wejścia:** Rygorystyczna walidacja `id` (format UUID) i `title` (typ, długość) za pomocą Zod chroni przed niepoprawnymi danymi i potencjalnymi atakami.
 
 ## 7. Obsługa błędów
+
 - **Błędy walidacji (400):** Zostaną przechwycone i obsłużone przez middleware lub bezpośrednio w handlerze, zwracając szczegółowe komunikaty o błędach.
 - **Brak zasobu (404):** Jeśli `quizService` nie znajdzie odpowiedniego quizu do aktualizacji, rzuci błąd `NotFoundError`, który zostanie zmapowany na odpowiedź 404.
 - **Błąd serwera (500):** Wszelkie nieoczekiwane błędy (np. błędy bazy danych) zostaną przechwycone, zalogowane przez `LoggerService` i zmapowane na standardową odpowiedź 500.
 
 ## 8. Rozważania dotyczące wydajności
+
 - Operacja `UPDATE` na pojedynczym wierszu jest wysoce wydajna, zwłaszcza przy użyciu indeksu na kluczu głównym (`id`).
 - Należy upewnić się, że kolumna `user_id` w tabeli `quizzes` jest zaindeksowana, aby przyspieszyć wyszukiwanie quizów dla konkretnego użytkownika.
 - Zapytanie pobierające zaktualizowane dane powinno być zoptymalizowane, aby efektywnie zliczać pytania.
 
 ## 9. Etapy wdrożenia
+
 1. **Rozszerzenie walidatora:**
    - W pliku `src/lib/validators/quiz.validator.ts` dodać nowy schemat Zod (`updateQuizSchema`) do walidacji danych wejściowych dla operacji `PATCH`. Schemat powinien obejmować walidację `title`.
 

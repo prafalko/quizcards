@@ -119,6 +119,24 @@ export class ExternalServiceError extends AppError {
 }
 
 /**
+ * AI generation error for AI service failures
+ */
+export class AIGenerationError extends AppError {
+  constructor(message: string, originalError: Error, correlationId?: string) {
+    super(
+      "AI_GENERATION_FAILED",
+      message,
+      500,
+      {
+        originalError: originalError.message,
+        stack: originalError.stack,
+      },
+      correlationId
+    );
+  }
+}
+
+/**
  * Rate limit error for rate limiting
  */
 export class RateLimitError extends AppError {

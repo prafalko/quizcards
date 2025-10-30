@@ -28,9 +28,6 @@ export interface GenerateIncorrectAnswersOutput {
 export async function generateIncorrectAnswers(
   input: GenerateIncorrectAnswersInput
 ): Promise<GenerateIncorrectAnswersOutput> {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-
   const { question, correctAnswer, temperature = 0.7, seed } = input;
 
   // Mock prompt that would be sent to AI

@@ -5,6 +5,7 @@ This directory contains manual test scripts for QuizCards API endpoints. These t
 ## Prerequisites
 
 1. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -17,26 +18,36 @@ npm run dev
 ### Test All Endpoints
 
 Run all tests in sequence:
+
 ```bash
 npm run test:api
 ```
 
 Or run individual tests:
+
 ```bash
 npm run test:post:quizzes:generate  # POST /api/quizzes/generate
 npm run test:get:quizzes            # GET /api/quizzes
 npm run test:get:quizzes:id         # GET /api/quizzes/:id
+npm run test:patch:quizzes:id       # PATCH /api/quizzes/:id
+npm run test:delete:quiz            # DELETE /api/quizzes/:id
+npm run test:get:question           # GET /api/questions/:id
+npm run test:patch:question         # PATCH /api/questions/:id
+npm run test:delete:question        # DELETE /api/questions/:id
+npm run test:regenerate:answers     # POST /api/questions/:id/regenerate
+npm run test:patch:answers:id       # PATCH /api/answers/:id
 ```
 
 ### Individual Test Files
 
 #### 1. POST /api/quizzes/generate - Generate Quiz
+
 ```bash
 npm run test:post:quizzes:generate
-# or: npx tsx src/test/test-post-quizzes-generate.ts
 ```
 
 **Tests:**
+
 - ✅ Generate quiz with valid Quizlet URL
 - ✅ Generate quiz with custom title
 - ❌ Invalid URL format (400)
@@ -52,12 +63,13 @@ npm run test:post:quizzes:generate
 ---
 
 #### 2. GET /api/quizzes - List Quizzes
+
 ```bash
 npm run test:get:quizzes
-# or: npx tsx src/test/test-get-quizzes.ts
 ```
 
 **Tests:**
+
 - ✅ Get all quizzes (no filter)
 - ✅ Filter by status=draft
 - ✅ Filter by status=published
@@ -66,12 +78,13 @@ npm run test:get:quizzes
 ---
 
 #### 3. GET /api/quizzes/:id - Get Quiz by ID
+
 ```bash
 npm run test:get:quizzes:id
-# or: npx tsx src/test/test-get-quizzes-id.ts
 ```
 
 **Tests:**
+
 - ✅ Get quiz with valid ID
 - ❌ Invalid UUID format (400)
 - ❌ Non-existent quiz ID (404)
@@ -81,16 +94,159 @@ npm run test:get:quizzes:id
 
 ---
 
+#### 4. PATCH /api/quizzes/:id - Update Quiz
+
+```bash
+npm run test:patch:quizzes:id
+```
+
+**Tests:**
+
+- ✅ Successful quiz update (200)
+- ❌ Invalid UUID format (400)
+- ❌ Non-existent quiz ID (404)
+- ❌ Empty title (400)
+- ❌ Title too long (>255 chars) (400)
+- ❌ Missing title field (400)
+- ❌ Invalid JSON body (400)
+- ✅ Title with whitespace (trimmed automatically)
+
+**Note:** This test automatically fetches a valid quiz ID and restores the original title after testing.
+
+---
+
+#### 5. DELETE /api/quizzes/:id - Delete Quiz
+
+```bash
+npm run test:delete:quiz
+```
+
+**Tests:**
+
+- ✅ Successful quiz deletion (204)
+- ❌ Invalid UUID format (400)
+- ❌ Non-existent quiz ID (404)
+- ✅ Verify cascade deletion (questions and answers deleted)
+
+**Note:** This test creates a temporary quiz for deletion testing.
+
+---
+
+#### 6. GET /api/questions/:id - Get Question by ID
+
+```bash
+npm run test:get:question
+```
+
+**Tests:**
+
+- ✅ Get question with valid ID
+- ❌ Invalid UUID format (400)
+- ❌ Non-existent question ID (404)
+- ✅ Verify answers are included
+- ✅ Verify ownership protection (IDOR)
+
+**Note:** This test automatically fetches a valid question ID from an existing quiz.
+
+---
+
+#### 7. PATCH /api/questions/:id - Update Question Text
+
+```bash
+npm run test:patch:question
+```
+
+**Tests:**
+
+- ✅ Successful question update (200)
+- ❌ Invalid UUID format (400)
+- ❌ Non-existent question ID (404)
+- ❌ Empty question text (400)
+- ❌ Question text too long (>2048 chars) (400)
+- ❌ Missing question_text field (400)
+- ❌ Invalid JSON body (400)
+- ✅ Question text with whitespace (trimmed automatically)
+
+**Note:** This test automatically fetches a valid question ID and restores the original text after testing.
+
+---
+
+#### 8. DELETE /api/questions/:id - Delete Question
+```bash
+npm run test:delete:question
+```
+
+**Tests:**
+- ✅ Successful question deletion (204)
+- ❌ Invalid UUID format (400)
+- ❌ Non-existent question ID (404)
+- ✅ Verify response body is empty (204)
+- ✅ Verify question no longer exists
+- ✅ Verify quiz question count decreased
+- ✅ Attempt to delete same question again (404)
+- ✅ Verify CASCADE deletion of answers
+
+**Note:** This test creates a temporary quiz with questions, deletes one question, and verifies cascade deletion of answers. No existing data is harmed.
+
+---
+
+#### 9. POST /api/questions/:id/regenerate - Regenerate Question Answers
+
+```bash
+npm run test:regenerate:answers
+```
+
+**Tests:**
+
+- ✅ Successful answer regeneration with default parameters (200)
+- ✅ Regeneration with custom temperature parameter
+- ✅ Regeneration with seed for reproducibility
+- ❌ Invalid UUID format (400)
+- ❌ Non-existent question ID (404)
+- ❌ Invalid temperature > 1 (400)
+- ❌ Invalid temperature < 0 (400)
+- ❌ Non-integer seed (400)
+- ❌ Invalid JSON body (400)
+- ✅ Empty request body (uses defaults)
+
+**Note:** The test verifies that incorrect answers are regenerated while keeping the question text and correct answer unchanged. The AI service has a 30-second timeout for safety.
+
+---
+
+#### 10. PATCH /api/answers/:id - Update Answer Text
+
+```bash
+npm run test:patch:answers:id
+```
+
+**Tests:**
+
+- ✅ Successful answer update (200)
+- ✅ Source change from 'ai' to 'ai-edited' when applicable
+- ❌ Invalid UUID format (400)
+- ❌ Non-existent answer ID (404)
+- ❌ Empty answer text (400)
+- ❌ Answer text too long (>512 chars) (400)
+- ❌ Missing answer_text field (400)
+- ❌ Invalid JSON body (400)
+- ✅ Answer text with whitespace (trimmed automatically)
+
+**Note:** The test automatically finds an existing incorrect answer from a quiz, updates it, and then restores the original text. It specifically tests the behavior where AI-generated answers (source: 'ai') are marked as edited (source: 'ai-edited') when manually modified.
+
+---
+
 ## Test Output
 
 Each test script provides colored console output:
+
 - 🧪 Test start
 - ✅ Success
 - ❌ Failure
-- ⚠️  Warning
+- ⚠️ Warning
 - 🏁 Test completion
 
 Example output:
+
 ```
 🧪 Testing GET /api/quizzes endpoint
 
@@ -113,27 +269,34 @@ const BASE_URL = "http://localhost:3000"; // Change this if needed
 ## Database Setup
 
 To test effectively, you should have:
+
 1. At least one quiz in the database (for GET /api/quizzes/:id tests)
 2. Mix of draft and published quizzes (for status filtering tests)
 
 You can generate test data by running:
+
 ```bash
-npx tsx src/test/test-generate-quiz.ts
+npx tsx src/test/test-post-quizzes-generate.ts
 ```
 
 ## Troubleshooting
 
 ### "No quizzes found in database"
+
 Run the generate-quiz test first to create some test data.
 
 ### "Connection refused" or "fetch failed"
+
 Make sure the dev server is running:
+
 ```bash
 npm run dev
 ```
 
 ### "SUPABASE_DEFAULT_USER_ID not configured"
+
 Add the following to your `.env` file:
+
 ```env
 SUPABASE_DEFAULT_USER_ID=your-user-id-here
 ```
@@ -141,10 +304,10 @@ SUPABASE_DEFAULT_USER_ID=your-user-id-here
 ## Future Improvements
 
 These manual tests will be replaced with automated integration tests using:
+
 - Vitest for test runner
 - Supertest or native fetch for API testing
 - Test database for isolated testing
 - CI/CD integration
 
 For now, these manual scripts provide quick verification during development.
-
