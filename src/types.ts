@@ -91,22 +91,11 @@ export interface UpdateQuizCommand {
 }
 
 /**
- * Answer update DTO - used when updating question answers
- * Requires id to identify which answer to update
- */
-export interface AnswerUpdateDTO {
-  id: string;
-  answer_text: string;
-  is_correct: boolean;
-}
-
-/**
- * Update question command - request to update question text and/or answers
- * Both fields are optional, but at least one should be provided
+ * Update question command - request to update question text
+ * Only question text can be updated
  */
 export interface UpdateQuestionCommand {
-  question_text?: string;
-  answers?: AnswerUpdateDTO[]; // Must be exactly 4 answers with exactly 1 correct
+  question_text: string;
 }
 
 /**
@@ -115,6 +104,14 @@ export interface UpdateQuestionCommand {
 export interface RegenerateAnswersCommand {
   temperature?: number; // Default: 0.7
   seed?: number; // Optional, for reproducibility
+}
+
+/**
+ * Update answer command - request to update an answer text
+ * Only answer text can be updated
+ */
+export interface UpdateAnswerCommand {
+  answer_text: string;
 }
 
 // ============================================================================

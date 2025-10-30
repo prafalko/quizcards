@@ -26,18 +26,21 @@ export interface Database {
           id: string;
           is_correct: boolean;
           question_id: string;
+          source: string;
         };
         Insert: {
           answer_text: string;
           id?: string;
           is_correct?: boolean;
           question_id: string;
+          source: string;
         };
         Update: {
           answer_text?: string;
           id?: string;
           is_correct?: boolean;
           question_id?: string;
+          source: string;
         };
         Relationships: [
           {

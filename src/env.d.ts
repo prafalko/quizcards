@@ -16,7 +16,6 @@ interface ImportMetaEnv {
   readonly SUPABASE_KEY: string;
   readonly SUPABASE_DEFAULT_USER_ID: string;
   readonly AI_API_KEY: string;
-  // more env variables...
 }
 
 interface ImportMeta {

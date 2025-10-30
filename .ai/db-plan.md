@@ -38,6 +38,8 @@ This table is managed by Supabase Auth.
 - question_id: UUID NOT NULL REFERENCES quiz_questions(id) ON DELETE CASCADE
 - answer_text: TEXT NOT NULL CHECK (char_length(answer_text) <= 512)
 - is_correct: BOOLEAN NOT NULL DEFAULT FALSE
+- source: VARCHAR(20) NOT NULL DEFAULT 'provided' CHECK (source in ('provided', 'manual', 'ai', 'ai-edited'))
+
 
 ## 2. Relacje między tabelami
 

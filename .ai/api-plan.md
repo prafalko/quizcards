@@ -179,22 +179,26 @@ The API is organized around the following main resources that correspond to data
     {
         "id": "uuid",
         "answer_text": "The process by which plants convert light energy into chemical energy",
-        "is_correct": true
+        "is_correct": true,
+        "source": "provided"
     },
     {
         "id": "uuid",
         "answer_text": "The process of cellular respiration in plants",
-        "is_correct": false
+        "is_correct": false,
+        "source": "ai"
     },
     {
         "id": "uuid",
         "answer_text": "The movement of water through plant cells",
-        "is_correct": false
+        "is_correct": false,
+        "source": "ai"
     },
     {
         "id": "uuid",
         "answer_text": "The reproduction process in flowering plants",
-        "is_correct": false
+        "is_correct": false,
+        "source": "ai"
     }
   ]
 }
@@ -205,33 +209,11 @@ The API is organized around the following main resources that correspond to data
 #### Update Question
 - **Method:** PATCH
 - **Path:** `/api/questions/:id`
-- **Description:** Update question text and/or answers
+- **Description:** Update question text
 - **Request Body:**
 ```json
 {
-  "question_text": "Updated question text?",
-  "answers": [
-    {
-      "id": "uuid",
-      "answer_text": "Updated correct answer",
-      "is_correct": true
-    },
-    {
-      "id": "uuid",
-      "answer_text": "Updated incorrect answer 1",
-      "is_correct": false
-    },
-    {
-      "id": "uuid",
-      "answer_text": "Updated incorrect answer 2",
-      "is_correct": false
-    },
-    {
-      "id": "uuid",
-      "answer_text": "Updated incorrect answer 3",
-      "is_correct": false
-    }
-  ]
+  "question_text": "Updated question text?"
 }
 ```
 - **Success Response (200 OK):**
@@ -249,31 +231,34 @@ The API is organized around the following main resources that correspond to data
   "answers": [
     {
       "id": "uuid",
-      "answer_text": "Updated correct answer",
-      "is_correct": true
+      "answer_text": "Correct answer",
+      "is_correct": true,
+      "source": "provided"
     },
     {
       "id": "uuid",
-      "answer_text": "Updated incorrect answer 1",
-      "is_correct": false
+      "answer_text": "Incorrect answer 1",
+      "is_correct": false,
+      "source": "ai"
     },
     {
       "id": "uuid",
-      "answer_text": "Updated incorrect answer 2",
-      "is_correct": false
+      "answer_text": "Incorrect answer 2",
+      "is_correct": false,
+      "source": "ai"
     },
     {
       "id": "uuid",
-      "answer_text": "Updated incorrect answer 3",
-      "is_correct": false
+      "answer_text": "Incorrect answer 3",
+      "is_correct": false,
+      "source": "ai"
     }
   ]
 }
 ```
 - **Error Responses:**
-  - 400 Bad Request: Invalid request body, question_text exceeds 2048 characters, answer_text exceeds 512 characters, or invalid answer count (must be exactly 4)
+  - 400 Bad Request: Invalid request body, question_text exceeds 2048 characters
   - 404 Not Found: Question does not exist
-  - 422 Unprocessable Entity: Must have exactly 1 correct answer
 
 #### Regenerate Question Answers
 - **Method:** POST
@@ -304,22 +289,26 @@ The API is organized around the following main resources that correspond to data
     {
       "id": "uuid",
       "answer_text": "The process by which plants convert light energy into chemical energy",
-      "is_correct": true
+      "is_correct": true,
+      "source": "provided"
     },
     {
       "id": "uuid",
       "answer_text": "The breakdown of glucose in mitochondria",
-      "is_correct": false
+      "is_correct": false,
+      "source": "ai"
     },
     {
       "id": "uuid",
       "answer_text": "The transport of nutrients through xylem and phloem",
-      "is_correct": false
+      "is_correct": false,
+      "source": "ai"
     },
     {
       "id": "uuid",
       "answer_text": "The process of carbon fixation in the Calvin cycle",
-      "is_correct": false
+      "is_correct": false,
+      "source": "ai"
     }
   ]
 }
@@ -335,6 +324,30 @@ The API is organized around the following main resources that correspond to data
 - **Success Response (204 No Content)**
 - **Error Responses:**
   - 404 Not Found: Question does not exist
+
+## 2.4. Answer Endpoints
+#### Update Answer
+- **Method:** PATCH
+- **Path:** `/api/answers/:id`
+- **Description:** Update answer text. If source is "ai" then it is changed to "ai-edited". `updated_at` in `quiz_questions` for associated quiz is also updated.
+- **Request Body:**
+```json
+{
+  "answer_text": "Updated answer"
+}
+```
+- **Success Response (200 OK):**
+```json
+{
+  "id": "uuid",
+  "answer_text": "Updated false answer",
+  "is_correct": false,
+  "source": "ai-edited"
+}
+```
+- **Error Responses:**
+  - 400 Bad Request: Invalid request body, answer_text exceeds 512 characters
+  - 404 Not Found: Answer does not exist
 
 ## 3. Rate Limiting
 
