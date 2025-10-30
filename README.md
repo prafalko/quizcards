@@ -42,7 +42,7 @@ $ npm install
 
 # 4. Start the dev server
 $ npm run dev
-# → open http://localhost:4321
+# → open http://localhost:3000
 ```
 
 Environment variables (e.g. Supabase keys, Gemini API key) should be placed in a `.env` file – see `.env.example` once available.
@@ -58,6 +58,26 @@ Environment variables (e.g. Supabase keys, Gemini API key) should be placed in a
 | `npm run lint`     | Run ESLint over the codebase           |
 | `npm run lint:fix` | Run ESLint with `--fix`                |
 | `npm run format`   | Format code with Prettier              |
+
+### Manual API Tests
+
+Run manual tests for API endpoints (requires dev server running):
+
+```bash
+# Test quiz generation (POST /api/quizzes/generate)
+npm run test:post:quizzes:generate
+
+# Test listing quizzes (GET /api/quizzes)
+npm run test:get:quizzes
+
+# Test getting quiz by ID (GET /api/quizzes/:id)
+npm run test:get:quizzes:id
+
+# Run all API tests in sequence
+npm run test:api
+```
+
+See [src/test/README.md](src/test/README.md) for detailed testing documentation.
 
 ## Project Scope
 

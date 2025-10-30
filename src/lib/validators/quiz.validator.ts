@@ -5,7 +5,7 @@ import { ValidationError } from "../errors";
  * Validator for CreateQuizCommand
  * Validates the request body for POST /api/quizzes/generate
  */
-export const validateRequestData = z.object({
+export const validateGenerateQuizCommand = z.object({
   source_url: z
     .string()
     .url("Invalid URL format")
@@ -32,12 +32,20 @@ export const validateRequestData = z.object({
 });
 
 /**
+ * Validator for QuizzesListQueryParams
+ * Validates query parameters for GET /api/quizzes
+ */
+export const validateQuizzesListQueryParams = z.object({
+  status: z.enum(["draft", "published"]).optional(),
+});
+
+/**
  * Validates if a string is a valid UUID format
  * @param id - The string to validate as UUID
  * @returns true if valid UUID, false otherwise
  */
 export function isValidUUID(id: string): boolean {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(id);
 }
 

@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { QuizDetailDTO, QuestionDetailDTO, AnswerDTO } from "../../types";
+import type { QuizDetailDTO, QuestionDetailDTO, AnswerDTO, QuizzesListDTO, QuizzesListQueryParams } from "../../types";
 import { logger } from "./logger.service";
 import { DatabaseError, NotFoundError } from "../../lib/errors";
 
@@ -83,11 +83,12 @@ export class QuizService {
               return aTime - bTime;
             })
             .map((answer) => {
-              const ans = answer as { id: string; answer_text: string; is_correct: boolean };
+              const ans = answer as { id: string; answer_text: string; is_correct: boolean; source: string };
               return {
                 id: ans.id,
                 answer_text: ans.answer_text,
                 is_correct: Boolean(ans.is_correct),
+                source: ans.source,
               };
             });
 
@@ -164,6 +165,76 @@ export class QuizService {
     } catch (error) {
       // Log the error and re-throw
       logger.logRequestError("getQuizById", correlationId || "unknown", error, userId, { quizId });
+      throw error;
+    }
+  }
+
+  /**
+   * Retrieves a list of quizzes for a user with optional status filtering
+   * Results are sorted by creation date (newest first)
+   * @param userId - The user ID for filtering quizzes
+   * @param params - Query parameters for filtering (optional status)
+   * @param correlationId - Request correlation ID for tracking
+   * @returns Promise<QuizzesListDTO> - List of quizzes with question counts
+   * @throws AppError for various error conditions
+   */
+  async getQuizzes(userId: string, params: QuizzesListQueryParams, correlationId?: string): Promise<QuizzesListDTO> {
+    const startTime = Date.now();
+    logger.logRequestStart("getQuizzes", correlationId || "unknown", userId, { params });
+
+    try {
+      // Build query with user_id filter and optional status filter
+      // We select quiz_questions(id) to get an array of question IDs for counting
+      let query = this.supabase
+        .from("quizzes")
+        .select(
+          `
+          *,
+          quiz_questions (id)
+        `
+        )
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+      // Apply optional status filter
+      if (params.status) {
+        query = query.eq("status", params.status);
+      }
+
+      const { data: quizzes, error: queryError } = await query;
+
+      if (queryError) {
+        logger.logDatabaseOperation("select", "quizzes", correlationId || "unknown", false, queryError);
+        throw new DatabaseError("getQuizzes", queryError, correlationId);
+      }
+
+      logger.logDatabaseOperation("select", "quizzes", correlationId || "unknown", true);
+
+      // Transform data to QuizzesListDTO
+      const quizzesList: QuizzesListDTO = (quizzes || []).map((quiz) => {
+        // Count questions for each quiz by counting the array length
+        const questionCount = Array.isArray(quiz.quiz_questions) ? quiz.quiz_questions.length : 0;
+
+        return {
+          id: quiz.id,
+          title: quiz.title,
+          status: quiz.status,
+          source_url: quiz.source_url,
+          quizlet_set_id: quiz.quizlet_set_id,
+          question_count: questionCount,
+          created_at: quiz.created_at,
+          updated_at: quiz.updated_at,
+        };
+      });
+
+      logger.logRequestComplete("getQuizzes", correlationId || "unknown", Date.now() - startTime, userId, {
+        count: quizzesList.length,
+        status: params.status || "all",
+      });
+
+      return quizzesList;
+    } catch (error) {
+      logger.logRequestError("getQuizzes", correlationId || "unknown", error, userId, { params });
       throw error;
     }
   }

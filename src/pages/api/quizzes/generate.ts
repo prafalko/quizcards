@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { ZodError } from "zod";
 
 import type { CreateQuizCommand, ErrorResponse, QuizSummaryDTO } from "../../../types";
-import { validateRequestData } from "../../../lib/validators/quiz.validator";
+import { validateGenerateQuizCommand } from "../../../lib/validators/quiz.validator";
 import { extractQuizletSetId, fetchQuizletSet } from "../../../lib/services/quizlet.service";
 import { generateIncorrectAnswers } from "../../../lib/services/ai.service";
 import { supabaseClient } from "../../../db/supabase.client";
@@ -33,7 +33,7 @@ export const POST: APIRoute = async ({ request }) => {
     let custom_title: string | undefined;
     try {
       const body = await request.json();
-      const validated = validateRequestData.parse(body) as CreateQuizCommand;
+      const validated = validateGenerateQuizCommand.parse(body) as CreateQuizCommand;
       source_url = validated.source_url;
       custom_title = validated.title;
     } catch (error) {
