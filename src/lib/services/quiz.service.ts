@@ -12,10 +12,12 @@ import type {
   QuizSummaryDTO,
   RegenerateAnswersCommand,
   QuestionMetadata,
+  CreateQuizCommand,
 } from "../../types";
 import { logger } from "./logger.service";
 import { DatabaseError, NotFoundError, ForbiddenError, AIGenerationError } from "../../lib/errors";
 import { generateIncorrectAnswers } from "./ai.service";
+import { fetchQuizletSet } from "./quizlet.service";
 
 /**
  * Timeout wrapper for promises
@@ -40,6 +42,80 @@ export class QuizService {
 
   constructor(supabase: SupabaseClient) {
     this.supabase = supabase;
+  }
+
+  async createQuizFromQuizlet(
+    command: CreateQuizCommand,
+    userId: string,
+    quizletSetId: string,
+    correlationId?: string
+  ): Promise<QuizSummaryDTO> {
+    const startTime = Date.now();
+    logger.logRequestStart("createQuizFromQuizlet", correlationId || "unknown", userId, { quizletSetId });
+
+    try {
+      // Step 1: Fetch flashcards from Quizlet
+      const quizletSet = await fetchQuizletSet(quizletSetId);
+
+      // Step 2: Generate incorrect answers using AI for all flashcards
+      const questionsWithAnswers = await Promise.all(
+        quizletSet.flashcards.map(async (flashcard) => {
+          const aiResponse = await generateIncorrectAnswers({
+            question: flashcard.term,
+            correctAnswer: flashcard.definition,
+          });
+
+          return {
+            question_text: flashcard.term,
+            answers: [
+              { answer_text: flashcard.definition, is_correct: true, source: "provided" as const },
+              ...aiResponse.incorrectAnswers.map((answer) => ({
+                answer_text: answer,
+                is_correct: false,
+                source: "ai" as const,
+              })),
+            ],
+            metadata: aiResponse.metadata,
+          };
+        })
+      );
+
+      // Step 3: Save quiz, questions, and answers in a transaction
+      const { data, error } = await this.supabase.rpc("create_quiz_with_questions_and_answers", {
+        quiz_title: command.title || quizletSet.title,
+        quiz_status: "draft",
+        quiz_source_url: command.source_url,
+        quiz_quizlet_set_id: quizletSetId,
+        quiz_user_id: userId,
+        questions: questionsWithAnswers.map((q) => ({
+          question_text: q.question_text,
+          metadata: q.metadata,
+          answers: q.answers,
+        })),
+      });
+
+      if (error) {
+        logger.logDatabaseOperation("rpc", "create_quiz_with_questions_and_answers", correlationId, false, error);
+        throw new DatabaseError("createQuizFromQuizlet", error, correlationId);
+      }
+
+      // The RPC function now returns a single quiz_summary object (not an array)
+      if (!data) {
+        throw new DatabaseError("createQuizFromQuizlet", new Error("No data returned from database"), correlationId);
+      }
+
+      const quizSummary = data as QuizSummaryDTO;
+
+      logger.logRequestComplete("createQuizFromQuizlet", correlationId || "unknown", Date.now() - startTime, userId, {
+        quizId: quizSummary.id,
+        questionCount: quizSummary.question_count,
+      });
+
+      return quizSummary;
+    } catch (error) {
+      logger.logRequestError("createQuizFromQuizlet", correlationId || "unknown", error, userId, { quizletSetId });
+      throw error;
+    }
   }
 
   /**

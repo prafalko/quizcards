@@ -258,6 +258,44 @@ Status: 200
 🏁 Tests completed!
 ```
 
+### Test Summary
+
+When running `npm run test:api`, you'll get a comprehensive summary at the end:
+
+```
+================================================================================
+📊 TEST SUMMARY
+================================================================================
+
+Total Tests: 42
+✅ Passed: 40
+❌ Failed: 2
+⏱️  Duration: 15.42s
+
+Results by endpoint:
+--------------------------------------------------------------------------------
+✅ POST /api/quizzes/generate              8/8 passed (3.21s)
+✅ GET /api/quizzes                        4/4 passed (0.52s)
+❌ GET /api/quizzes/:id                    2/4 passed (0.78s)
+...
+
+❌ FAILED TESTS:
+--------------------------------------------------------------------------------
+
+GET /api/quizzes/:id:
+  • Test 3: GET /api/quizzes/:id with invalid UUID (should fail)
+    ❌ FAILED: Expected 400 status
+
+PATCH /api/answers/:id:
+  • Test 2: PATCH with empty answer_text (should fail)
+    ❌ FAILED: Expected 400 status
+```
+
+This summary makes it easy to:
+- See overall test health at a glance
+- Identify which endpoints have issues
+- Quickly locate failed tests without scrolling through logs
+
 ## Server Configuration
 
 By default, tests connect to `http://localhost:3000`. If your dev server runs on a different port, update the `BASE_URL` constant in each test file.

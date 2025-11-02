@@ -84,17 +84,27 @@ export class ForbiddenError extends AppError {
  */
 export class DatabaseError extends AppError {
   constructor(operation: string, originalError: unknown, correlationId?: string) {
-    const errorMessage = originalError instanceof Error ? originalError.message : String(originalError);
-    super(
-      "DATABASE_ERROR",
-      `Database operation failed: ${operation}`,
-      500,
-      {
-        operation,
-        originalError: errorMessage,
-      },
-      correlationId
-    );
+    let message = "A database error occurred";
+    const details: Record<string, unknown> = { operation };
+
+    if (typeof originalError === "object" && originalError !== null) {
+      if ("message" in originalError && typeof originalError.message === "string") {
+        message = originalError.message;
+      }
+      if ("details" in originalError) {
+        details.db_details = originalError.details;
+      }
+      if ("hint" in originalError) {
+        details.db_hint = originalError.hint;
+      }
+      if ("code" in originalError) {
+        details.db_code = originalError.code;
+      }
+    } else {
+      details.originalError = String(originalError);
+    }
+
+    super("DATABASE_ERROR", `Database operation failed: ${operation}`, 500, details, correlationId);
   }
 }
 

@@ -20,7 +20,7 @@
     "test:delete:question": "tsx src/test/test-delete-question.ts",
     "test:regenerate:answers": "tsx src/test/test-regenerate-answers.ts",
     "test:patch:answers:id": "tsx src/test/test-patch-answers-id.ts",
-    "test:api": "npm run test:post:quizzes:generate && npm run test:get:quizzes && npm run test:get:quizzes:id && npm run test:patch:quizzes:id && npm run test:delete:quiz && npm run test:get:question && npm run test:patch:question && npm run test:delete:question && npm run test:regenerate:answers && npm run test:patch:answers:id"
+    "test:api": "tsx src/test/run-all-tests.ts"
   },
   "dependencies": {
     "@astrojs/node": "^9.4.3",

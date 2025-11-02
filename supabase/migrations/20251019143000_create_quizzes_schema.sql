@@ -8,6 +8,14 @@
 --   - rls policies ensure users can only access their own quizzes
 
 -- ============================================================================
+-- custom types
+-- description: define custom enum types for status and source fields
+-- ============================================================================
+
+create type quiz_status as enum ('draft', 'published');
+create type answer_source as enum ('provided', 'manual', 'ai', 'ai-edited');
+
+-- ============================================================================
 -- table: quizzes
 -- description: stores quiz metadata created by users
 -- ============================================================================
@@ -18,7 +26,7 @@ create table quizzes (
   source_url text null,
   quizlet_set_id varchar(255) null,
   title varchar(255) not null,
-  status varchar(50) not null default 'draft',
+  status quiz_status not null default 'draft',
   created_at timestamp with time zone not null default now(),
   updated_at timestamp with time zone not null default now()
 );
@@ -58,7 +66,7 @@ create table answers (
   question_id uuid not null references quiz_questions(id) on delete cascade,
   answer_text text not null check (char_length(answer_text) <= 512),
   is_correct boolean not null default false,
-  source varchar(20) not null default 'provided' check (source in ('provided', 'manual', 'ai', 'ai-edited'))
+  source answer_source not null default 'provided'
 );
 
 -- add comment explaining the table purpose

@@ -1,11 +1,9 @@
 import type { APIRoute } from "astro";
 
-import type { ErrorResponse, UpdateQuizCommand } from "../../../types";
+import type { UpdateQuizCommand } from "../../../types";
 import { validateId, validateUpdateQuizCommand } from "../../../lib/validators/quiz.validator";
-import { createQuizService } from "../../../lib/services/quiz.service";
-import { supabaseClient, supabaseDefaultUserId } from "../../../db/supabase.client";
-import { logger, LoggerService } from "../../../lib/services/logger.service";
-import { AppError, ValidationError, UnauthorizedError, extractErrorDetails } from "../../../lib/errors";
+import { ValidationError } from "../../../lib/errors";
+import { createApiRoute } from "../../../lib/api-handler";
 
 export const prerender = false;
 
@@ -24,101 +22,30 @@ export const prerender = false;
  * @returns 404 Not Found if quiz doesn't exist or user doesn't have access
  * @returns 500 Internal Server Error for database or server errors
  */
-export const GET: APIRoute = async ({ params, request }) => {
-  const correlationId = LoggerService.generateCorrelationId();
-  const startTime = Date.now();
+export const GET: APIRoute = createApiRoute(async ({ params, context }) => {
+  const { userId, quizService, correlationId } = context;
 
-  try {
-    logger.logRequestStart("GET /api/quizzes/:id", correlationId, undefined, {
-      url: request.url,
-      method: request.method,
-    });
+  // Step 1: Extract and validate quiz ID from URL parameters
+  const { id } = params;
 
-    // Step 1: Extract and validate quiz ID from URL parameters
-    const { id } = params;
+  if (!id || typeof id !== "string") {
+    throw new ValidationError("Quiz ID is required in URL path", { id }, correlationId);
+  }
+  validateId(id, "Quiz");
 
-    if (!id || typeof id !== "string") {
-      throw new ValidationError("Quiz ID is required in URL path", { id }, correlationId);
-    }
+  // Step 2: Retrieve quiz data using service
+  const quizData = await quizService.getQuizById(id, userId, correlationId);
 
-    // Validate UUID format
-    validateId(id, "Quiz");
-
-    // Step 2: Initialize service and get user context
-    const quizService = createQuizService(supabaseClient);
-    const userId = supabaseDefaultUserId; // MOCK: Development user ID
-
-    if (!userId) {
-      throw new UnauthorizedError(
-        "User authentication required - SUPABASE_DEFAULT_USER_ID not configured",
-        correlationId
-      );
-    }
-
-    // Step 3: Retrieve quiz data using service
-    const quizData = await quizService.getQuizById(id, userId, correlationId);
-
-    // Step 4: Return successful response with caching headers
-    const responseHeaders = new Headers({
-      "Content-Type": "application/json",
-      // Cache for 5 minutes for published quizzes, no cache for drafts
+  // Step 3: Return successful response with caching headers
+  return {
+    body: quizData,
+    headers: {
       "Cache-Control":
         quizData.status === "published" ? "public, max-age=300, s-maxage=300" : "no-cache, no-store, must-revalidate",
-      // ETag for conditional requests
       ETag: `"quiz-${quizData.id}-${quizData.updated_at}"`,
-      // Add correlation ID for debugging
-      "X-Correlation-ID": correlationId,
-    });
-    logger.logRequestComplete("GET /api/quizzes/:id", correlationId, Date.now() - startTime, userId, {
-      quizId: id,
-      status: quizData.status,
-      questionCount: quizData.questions.length,
-    });
-
-    return new Response(JSON.stringify(quizData), {
-      status: 200,
-      headers: responseHeaders,
-    });
-  } catch (error) {
-    // Handle different error types
-    if (error instanceof AppError) {
-      logger.logRequestError("GET /api/quizzes/:id", correlationId, error, undefined, {
-        errorDetails: extractErrorDetails(error),
-      });
-
-      const responseHeaders = new Headers({
-        "Content-Type": "application/json",
-        "X-Correlation-ID": correlationId,
-      });
-
-      return new Response(JSON.stringify(error.toResponse()), {
-        status: error.statusCode,
-        headers: responseHeaders,
-      });
-    }
-
-    // Handle unexpected errors
-    logger.logRequestError("GET /api/quizzes/:id", correlationId, error, undefined, {
-      errorDetails: extractErrorDetails(error),
-    });
-
-    const errorResponse: ErrorResponse = {
-      error: {
-        code: "INTERNAL_ERROR",
-        message: "An unexpected error occurred while retrieving the quiz",
-        details: { correlationId },
-      },
-    };
-
-    return new Response(JSON.stringify(errorResponse), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-        "X-Correlation-ID": correlationId,
-      },
-    });
-  }
-};
+    },
+  };
+});
 
 /**
  * PATCH /api/quizzes/:id
@@ -138,115 +65,43 @@ export const GET: APIRoute = async ({ params, request }) => {
  * @returns 404 Not Found if quiz doesn't exist or user doesn't have access
  * @returns 500 Internal Server Error for database or server errors
  */
-export const PATCH: APIRoute = async ({ params, request }) => {
-  const correlationId = LoggerService.generateCorrelationId();
-  const startTime = Date.now();
+export const PATCH: APIRoute = createApiRoute(async ({ params, request, context }) => {
+  const { userId, quizService, correlationId } = context;
 
-  try {
-    logger.logRequestStart("PATCH /api/quizzes/:id", correlationId, undefined, {
-      url: request.url,
-      method: request.method,
-    });
-
-    // Step 1: Extract and validate quiz ID from URL parameters
-    const { id } = params;
-
-    if (!id || typeof id !== "string") {
-      throw new ValidationError("Quiz ID is required in URL path", { id }, correlationId);
-    }
-
-    // Validate UUID format
-    validateId(id, "Quiz");
-
-    // Step 2: Parse and validate request body
-    let requestBody: unknown;
-    try {
-      requestBody = await request.json();
-    } catch (parseError) {
-      throw new ValidationError(
-        "Invalid JSON in request body",
-        { error: parseError instanceof Error ? parseError.message : String(parseError) },
-        correlationId
-      );
-    }
-
-    // Validate request body against schema
-    const validationResult = validateUpdateQuizCommand.safeParse(requestBody);
-    if (!validationResult.success) {
-      throw new ValidationError("Invalid request body", { errors: validationResult.error.errors }, correlationId);
-    }
-
-    const updateData: UpdateQuizCommand = validationResult.data;
-
-    // Step 3: Initialize service and get user context
-    const quizService = createQuizService(supabaseClient);
-    const userId = supabaseDefaultUserId; // MOCK: Development user ID
-
-    if (!userId) {
-      throw new UnauthorizedError(
-        "User authentication required - SUPABASE_DEFAULT_USER_ID not configured",
-        correlationId
-      );
-    }
-
-    // Step 4: Update quiz using service
-    const updatedQuiz = await quizService.updateQuiz(id, userId, updateData, correlationId);
-
-    // Step 5: Return successful response
-    const responseHeaders = new Headers({
-      "Content-Type": "application/json",
-      "X-Correlation-ID": correlationId,
-    });
-
-    logger.logRequestComplete("PATCH /api/quizzes/:id", correlationId, Date.now() - startTime, userId, {
-      quizId: id,
-      title: updateData.title,
-    });
-
-    return new Response(JSON.stringify(updatedQuiz), {
-      status: 200,
-      headers: responseHeaders,
-    });
-  } catch (error) {
-    // Handle different error types
-    if (error instanceof AppError) {
-      logger.logRequestError("PATCH /api/quizzes/:id", correlationId, error, undefined, {
-        errorDetails: extractErrorDetails(error),
-      });
-
-      const responseHeaders = new Headers({
-        "Content-Type": "application/json",
-        "X-Correlation-ID": correlationId,
-      });
-
-      return new Response(JSON.stringify(error.toResponse()), {
-        status: error.statusCode,
-        headers: responseHeaders,
-      });
-    }
-
-    // Handle unexpected errors
-    logger.logRequestError("PATCH /api/quizzes/:id", correlationId, error, undefined, {
-      errorDetails: extractErrorDetails(error),
-    });
-
-    const errorResponse: ErrorResponse = {
-      error: {
-        code: "INTERNAL_ERROR",
-        message: "An unexpected error occurred while updating the quiz",
-        details: { correlationId },
-      },
-    };
-
-    return new Response(JSON.stringify(errorResponse), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-        "X-Correlation-ID": correlationId,
-      },
-    });
+  // Step 1: Extract and validate quiz ID from URL parameters
+  const { id } = params;
+  if (!id || typeof id !== "string") {
+    throw new ValidationError("Quiz ID is required in URL path", { id }, correlationId);
   }
-};
+  validateId(id, "Quiz");
+
+  // Step 2: Parse and validate request body
+  let requestBody: unknown;
+  try {
+    requestBody = await request.json();
+  } catch (parseError) {
+    throw new ValidationError(
+      "Invalid JSON in request body",
+      { error: parseError instanceof Error ? parseError.message : String(parseError) },
+      correlationId
+    );
+  }
+
+  const validationResult = validateUpdateQuizCommand.safeParse(requestBody);
+  if (!validationResult.success) {
+    throw new ValidationError("Invalid request body", { errors: validationResult.error.errors }, correlationId);
+  }
+
+  const updateData: UpdateQuizCommand = validationResult.data;
+
+  // Step 3: Update quiz using service
+  const updatedQuiz = await quizService.updateQuiz(id, userId, updateData, correlationId);
+
+  // Step 4: Return successful response
+  return {
+    body: updatedQuiz,
+  };
+});
 
 /**
  * DELETE /api/quizzes/:id
@@ -264,91 +119,21 @@ export const PATCH: APIRoute = async ({ params, request }) => {
  * @returns 404 Not Found if quiz doesn't exist or user doesn't have access
  * @returns 500 Internal Server Error for database or server errors
  */
-export const DELETE: APIRoute = async ({ params, request }) => {
-  const correlationId = LoggerService.generateCorrelationId();
-  const startTime = Date.now();
+export const DELETE: APIRoute = createApiRoute(async ({ params, context }) => {
+  const { userId, quizService, correlationId } = context;
 
-  try {
-    logger.logRequestStart("DELETE /api/quizzes/:id", correlationId, undefined, {
-      url: request.url,
-      method: request.method,
-    });
-
-    // Step 1: Extract and validate quiz ID from URL parameters
-    const { id } = params;
-
-    if (!id || typeof id !== "string") {
-      throw new ValidationError("Quiz ID is required in URL path", { id }, correlationId);
-    }
-
-    // Validate UUID format
-    validateId(id, "Quiz");
-
-    // Step 2: Initialize service and get user context
-    const quizService = createQuizService(supabaseClient);
-    const userId = supabaseDefaultUserId; // MOCK: Development user ID
-
-    if (!userId) {
-      throw new UnauthorizedError(
-        "User authentication required - SUPABASE_DEFAULT_USER_ID not configured",
-        correlationId
-      );
-    }
-
-    // Step 3: Delete quiz using service
-    // This will also delete all related questions and answers via CASCADE
-    await quizService.deleteQuiz(id, userId, correlationId);
-
-    // Step 4: Return successful response with 204 No Content
-    const responseHeaders = new Headers({
-      "X-Correlation-ID": correlationId,
-    });
-
-    logger.logRequestComplete("DELETE /api/quizzes/:id", correlationId, Date.now() - startTime, userId, {
-      quizId: id,
-    });
-
-    return new Response(null, {
-      status: 204,
-      headers: responseHeaders,
-    });
-  } catch (error) {
-    // Handle different error types
-    if (error instanceof AppError) {
-      logger.logRequestError("DELETE /api/quizzes/:id", correlationId, error, undefined, {
-        errorDetails: extractErrorDetails(error),
-      });
-
-      const responseHeaders = new Headers({
-        "Content-Type": "application/json",
-        "X-Correlation-ID": correlationId,
-      });
-
-      return new Response(JSON.stringify(error.toResponse()), {
-        status: error.statusCode,
-        headers: responseHeaders,
-      });
-    }
-
-    // Handle unexpected errors
-    logger.logRequestError("DELETE /api/quizzes/:id", correlationId, error, undefined, {
-      errorDetails: extractErrorDetails(error),
-    });
-
-    const errorResponse: ErrorResponse = {
-      error: {
-        code: "INTERNAL_ERROR",
-        message: "An unexpected error occurred while deleting the quiz",
-        details: { correlationId },
-      },
-    };
-
-    return new Response(JSON.stringify(errorResponse), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-        "X-Correlation-ID": correlationId,
-      },
-    });
+  // Step 1: Extract and validate quiz ID from URL parameters
+  const { id } = params;
+  if (!id || typeof id !== "string") {
+    throw new ValidationError("Quiz ID is required in URL path", { id }, correlationId);
   }
-};
+  validateId(id, "Quiz");
+
+  // Step 2: Delete quiz using service
+  await quizService.deleteQuiz(id, userId, correlationId);
+
+  // Step 3: Return successful response with 204 No Content
+  return {
+    status: 204,
+  };
+});
