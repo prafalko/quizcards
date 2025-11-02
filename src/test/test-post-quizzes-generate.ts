@@ -313,6 +313,97 @@ async function testGenerateQuiz() {
   }
   console.log();
 
+  // Test 10: Quizlet URL with language code (Polish)
+  console.log("Test 10: POST with Quizlet URL containing language code (pl)");
+  try {
+    const response = await fetch(`${BASE_URL}/api/quizzes/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        source_url: "https://quizlet.com/pl/870889722/tasiemce-flash-cards/",
+      }),
+    });
+    const data = await response.json();
+
+    console.log(`Status: ${response.status}`);
+
+    if (response.status === 201) {
+      const quiz = data as QuizSummaryDTO;
+      console.log(`✅ SUCCESS: Quiz created with language code in URL!`);
+      console.log(`   ID: ${quiz.id}`);
+      console.log(`   Title: ${quiz.title}`);
+      console.log(`   Quizlet Set ID: ${quiz.quizlet_set_id}`);
+    } else {
+      console.log(`❌ FAILED: Expected 201 but got ${response.status}`);
+      console.log(`Response:`, JSON.stringify(data, null, 2));
+    }
+  } catch (error) {
+    console.log(`❌ ERROR:`, error);
+  }
+  console.log();
+
+  // Test 11: Quizlet URL with language code and extra path segments
+  console.log("Test 11: POST with Quizlet URL containing language code and extra segments");
+  try {
+    const response = await fetch(`${BASE_URL}/api/quizzes/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        source_url: "https://quizlet.com/en/123456789/test-set/extra/path/segments/",
+      }),
+    });
+    const data = await response.json();
+
+    console.log(`Status: ${response.status}`);
+
+    if (response.status === 201) {
+      const quiz = data as QuizSummaryDTO;
+      console.log(`✅ SUCCESS: Quiz created with extra path segments ignored!`);
+      console.log(`   ID: ${quiz.id}`);
+      console.log(`   Quizlet Set ID: ${quiz.quizlet_set_id}`);
+    } else {
+      console.log(`❌ FAILED: Expected 201 but got ${response.status}`);
+      console.log(`Response:`, JSON.stringify(data, null, 2));
+    }
+  } catch (error) {
+    console.log(`❌ ERROR:`, error);
+  }
+  console.log();
+
+  // Test 12: Quizlet URL with www subdomain and language code
+  console.log("Test 12: POST with Quizlet URL containing www subdomain and language code");
+  try {
+    const response = await fetch(`${BASE_URL}/api/quizzes/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        source_url: "https://www.quizlet.com/pl/555666777/sample-set/",
+      }),
+    });
+    const data = await response.json();
+
+    console.log(`Status: ${response.status}`);
+
+    if (response.status === 201) {
+      const quiz = data as QuizSummaryDTO;
+      console.log(`✅ SUCCESS: Quiz created with www subdomain and language code!`);
+      console.log(`   ID: ${quiz.id}`);
+      console.log(`   Quizlet Set ID: ${quiz.quizlet_set_id}`);
+    } else {
+      console.log(`❌ FAILED: Expected 201 but got ${response.status}`);
+      console.log(`Response:`, JSON.stringify(data, null, 2));
+    }
+  } catch (error) {
+    console.log(`❌ ERROR:`, error);
+  }
+  console.log();
+
   console.log("🏁 Tests completed!");
   console.log("\n📝 Note: This endpoint uses MOCK services in development.");
   console.log("   Real Quizlet integration and AI will be tested in production/staging.");

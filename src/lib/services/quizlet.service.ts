@@ -7,12 +7,14 @@ import type { QuizletSet, ErrorResponse } from "../../types";
 
 /**
  * Extracts the Quizlet set ID from a Quizlet URL
+ * Supports URLs with optional language codes: quizlet.com/{lang}/{id}/ or quizlet.com/{id}/
  * @param url - Full Quizlet set URL
  * @returns Quizlet set ID
  * @throws Error if URL format is invalid
  */
 export function extractQuizletSetId(url: string): string {
-  const regex = /quizlet\.com\/(\d+)\//;
+  // Match either: quizlet.com/{digits}/ or quizlet.com/{2-letter-lang}/{digits}/
+  const regex = /quizlet\.com\/(?:[a-z]{2}\/)?(\d+)\//;
   const match = url.match(regex);
 
   if (!match || !match[1]) {
