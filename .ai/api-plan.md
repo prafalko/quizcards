@@ -512,7 +512,7 @@ To support the metrics defined in the PRD:
 
 - **MS-01 (AI Acceptance Rate)**: Track whether questions are modified before first quiz completion
   - Store `first_accessed_at` and `last_modified_at` timestamps on questions
-  - Flag questions as "ai_accepted" if not modified before publishing the quiz (change of the quiz' status from draft to published)
+  - Flag questions as "ai_accepted" if not modified before first quiz solving (change of the quiz' status from draft to published)
 - **MS-02 (AI-Generated Questions Ratio)**: Track question origin
   - Store `generation_source` in metadata ('ai' vs 'manual')
   - All questions in MVP are 'ai' generated

@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { ThemeToggle } from "../components/ui/theme-toggle.tsx";
 
 interface Props {
   title?: string;
@@ -19,6 +20,7 @@ const { title = "10x Astro Starter" } = Astro.props;
   </head>
   <body>
     <slot />
+    <ThemeToggle client:load />
   </body>
 </html>
 

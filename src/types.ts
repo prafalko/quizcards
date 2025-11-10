@@ -84,10 +84,10 @@ export interface CreateQuizCommand {
 
 /**
  * Update quiz command - request to update quiz properties
- * Currently only title can be updated
  */
 export interface UpdateQuizCommand {
-  title: string;
+  title?: string;
+  status?: quiz_status;
 }
 
 /**

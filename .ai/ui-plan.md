@@ -45,7 +45,7 @@ Struktura ta prowadzi użytkownika krok po kroku przez główny proces: import f
   - `EditableTitle`: Nagłówek `h1`, który po kliknięciu zmienia się w pole `input` do edycji tytułu.
   - `QuestionEditList`: Lista formularzy do edycji poszczególnych pytań.
   - `QuestionEditForm`: Formularz dla jednego pytania, zawierający pole `textarea` dla pytania, cztery pola `input` dla odpowiedzi oraz przyciski: "Generuj odpowiedzi ponownie" i "Usuń pytanie".
-  - `SaveChangesBar`: Pasek na górze lub dole strony z przyciskiem "Zapisz i opublikuj", informujący o niezapisanych zmianach.
+  - `SaveChangesBar`: Pasek na górze lub dole strony z przyciskiem "Zapisz", informujący o niezapisanych zmianach.
 - **UX, dostępność i względy bezpieczeństwa:**
   - **UX:** Zmiany są zapisywane w sposób wsadowy, co minimalizuje liczbę zapytań do API.
   - **Dostępność:** Wszystkie pola formularzy mają etykiety. Akcje są dostępne z klawiatury.
@@ -86,7 +86,7 @@ Główna ścieżka użytkownika (happy path) wygląda następująco:
 
 1.  **Uwierzytelnienie:** Użytkownik loguje się lub rejestruje (`Widok Logowania / Rejestracji`), po czym zostaje przekierowany do `Panelu Głównego`.
 2.  **Generowanie:** W `Panelu Głównym` wkleja link do Quizlet i klika "Generuj". Aplikacja pokazuje stan ładowania.
-3.  **Weryfikacja i Edycja:** Po pomyślnym utworzeniu quizu, użytkownik jest automatycznie przenoszony do `Widoku Edycji Quizu` (`/quiz/:id/edit`). Tutaj przegląda i modyfikuje pytania, a na koniec klika "Zapisz i opublikuj".
+3.  **Weryfikacja i Edycja:** Po pomyślnym utworzeniu quizu, użytkownik jest automatycznie przenoszony do `Widoku Edycji Quizu` (`/quiz/:id/edit`). Tutaj przegląda i modyfikuje pytania, a na koniec klika "Zapisz".
 4.  **Powrót do Panelu:** Po zapisaniu zmian, jest przekierowywany z powrotem do `Panelu Głównego`, gdzie nowy quiz jest widoczny na liście.
 5.  **Rozpoczęcie:** Użytkownik klika "Rozpocznij" na karcie wybranego quizu.
 6.  **Rozwiązywanie:** Zostaje przeniesiony do `Widoku Rozwiązywania Quizu` (`/quiz/:id/play`) i odpowiada na wszystkie pytania.

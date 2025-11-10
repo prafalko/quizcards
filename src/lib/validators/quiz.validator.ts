@@ -62,9 +62,19 @@ export const validateQuizzesListQueryParams = z.object({
  * Validator for UpdateQuizCommand
  * Validates the request body for PATCH /api/quizzes/:id
  */
-export const validateUpdateQuizCommand = z.object({
-  title: z.string().min(1, "Title cannot be empty").max(255, "Title must not exceed 255 characters").trim(),
-});
+export const validateUpdateQuizCommand = z
+  .object({
+    title: z
+      .string()
+      .min(1, "Title cannot be empty")
+      .max(255, "Title must not exceed 255 characters")
+      .trim()
+      .optional(),
+    status: z.enum(["draft", "published"]).optional(),
+  })
+  .refine((data) => data.title !== undefined || data.status !== undefined, {
+    message: "At least one field (title or status) must be provided",
+  });
 
 /**
  * Validator for UpdateQuestionCommand

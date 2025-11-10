@@ -95,7 +95,13 @@ export class QuizService {
       });
 
       if (error) {
-        logger.logDatabaseOperation("rpc", "create_quiz_with_questions_and_answers", correlationId, false, error);
+        logger.logDatabaseOperation(
+          "rpc",
+          "create_quiz_with_questions_and_answers",
+          correlationId || "unknown",
+          false,
+          error
+        );
         throw new DatabaseError("createQuizFromQuizlet", error, correlationId);
       }
 
@@ -365,12 +371,21 @@ export class QuizService {
     try {
       // Step 1: Update the quiz with new data
       // Important: We filter by both id AND user_id to prevent unauthorized access (IDOR protection)
+      const updateData: Record<string, unknown> = {
+        updated_at: new Date().toISOString(),
+      };
+
+      if (data.title !== undefined) {
+        updateData.title = data.title;
+      }
+
+      if (data.status !== undefined) {
+        updateData.status = data.status;
+      }
+
       const { error: updateError } = await this.supabase
         .from("quizzes")
-        .update({
-          title: data.title,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq("id", quizId)
         .eq("user_id", userId);
 
@@ -428,6 +443,7 @@ export class QuizService {
       logger.logRequestComplete("updateQuiz", correlationId || "unknown", Date.now() - startTime, userId, {
         quizId,
         title: data.title,
+        status: data.status,
       });
 
       return quizSummary;
@@ -971,7 +987,11 @@ export class QuizService {
         logger.warn("Failed to update quiz updated_at after question deletion", {
           correlationId,
           quizId,
-          error: updateError,
+          error: {
+            message: updateError.message,
+            code: updateError.code,
+            details: { hint: updateError.hint, details: updateError.details },
+          },
         });
       } else {
         logger.logDatabaseOperation("update", "quizzes", correlationId || "unknown", true);
@@ -1079,7 +1099,9 @@ export class QuizService {
       if (!correctAnswer) {
         throw new DatabaseError(
           "regenerateIncorrectAnswers",
-          new Error("Question has no correct answer"),
+          new Error(
+            `Question "${questionData.question_text}" has no correct answer. Please provide correct answer before regenerating.`
+          ),
           correlationId
         );
       }

@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import { Dashboard } from "../components/Dashboard";
 import type { QuizzesListDTO } from "../types";
+import { logger } from "../lib/services/logger.service";
 
 // Konfiguracja dla hybrid rendering - ta strona będzie server-side rendered
 export const prerender = false;
@@ -17,11 +18,21 @@ try {
     quizzes = await response.json();
   } else {
     error = "Nie udało się pobrać listy quizów";
-    console.error("Failed to fetch quizzes:", response.status);
+    logger.error("Failed to fetch quizzes", {
+      error: {
+        message: `HTTP ${response.status}: ${response.statusText}`,
+        details: { status: response.status },
+      },
+    });
   }
 } catch (e) {
   error = "Błąd połączenia z serwerem";
-  console.error("Failed to fetch quizzes:", e);
+  logger.error("Failed to fetch quizzes", {
+    error: {
+      message: e instanceof Error ? e.message : String(e),
+      stack: e instanceof Error ? e.stack : undefined,
+    },
+  });
 }
 ---
 

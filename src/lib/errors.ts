@@ -104,7 +104,7 @@ export class DatabaseError extends AppError {
       details.originalError = String(originalError);
     }
 
-    super("DATABASE_ERROR", `Database operation failed: ${operation}`, 500, details, correlationId);
+    super("DATABASE_ERROR", message, 500, details, correlationId);
   }
 }
 
