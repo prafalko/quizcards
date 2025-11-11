@@ -17,9 +17,7 @@ export function AnswerOptions({ answers, onSelect }: AnswerOptionsProps) {
           className="h-auto p-6 text-left justify-start whitespace-normal"
           onClick={() => onSelect(answer.id)}
         >
-          <span className="text-base leading-relaxed">
-            {answer.answer_text}
-          </span>
+          <span className="text-base leading-relaxed">{answer.answer_text}</span>
         </Button>
       ))}
     </div>

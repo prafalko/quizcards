@@ -200,6 +200,30 @@ export interface UserAnswer {
 }
 
 // ============================================================================
+// ViewModel Types for Quiz Results Interface
+// ============================================================================
+
+/**
+ * Represents the status of an answer in the results view
+ */
+export type AnswerStatus = "correct" | "user_incorrect" | "neutral";
+
+/**
+ * Answer ViewModel for the results view - extends AnswerDTO with a status
+ */
+export interface ResultAnswerViewModel extends AnswerDTO {
+  status: AnswerStatus;
+}
+
+/**
+ * Question ViewModel for the results view - includes user's answer and answer statuses
+ */
+export interface ResultQuestionViewModel extends QuestionDetailDTO {
+  userAnswerId: string | null;
+  answers: ResultAnswerViewModel[];
+}
+
+// ============================================================================
 // External Service Types (Quizlet, AI)
 // ============================================================================
 

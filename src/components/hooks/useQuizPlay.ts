@@ -1,12 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import type {
-  QuizDetailDTO,
-  QuizQuestionViewModel,
-  UserAnswer,
-  UpdateQuizCommand,
-  QuizSummaryDTO,
-  ErrorResponse
-} from "@/types";
+import type { QuizDetailDTO, QuizQuestionViewModel, UserAnswer, UpdateQuizCommand, ErrorResponse } from "@/types";
 import { logger } from "@/lib/services/logger.service";
 
 type QuizPhase = "loading" | "playing" | "finished";
@@ -43,15 +36,29 @@ export function useQuizPlay(initialQuiz: QuizDetailDTO): UseQuizPlayReturn {
       try {
         // Step 1: Check if quiz has questions
         if (!initialQuiz.questions || initialQuiz.questions.length === 0) {
-          setQuizPhase("finished"); // Will show empty quiz message
+          // Empty quiz - save empty answers and redirect to results
+          try {
+            sessionStorage.setItem(`quiz-${initialQuiz.id}-answers`, JSON.stringify([]));
+            sessionStorage.setItem(`quiz-${initialQuiz.id}-questions`, JSON.stringify([]));
+          } catch (error) {
+            logger.error("Failed to save empty quiz session data", {
+              error: {
+                message: error instanceof Error ? error.message : String(error),
+                details: { quizId: initialQuiz.id },
+              },
+            });
+          }
+
+          // Redirect to results page immediately
+          window.location.assign(`/quizzes/${initialQuiz.id}/results`);
           return;
         }
 
         // Step 2: Shuffle questions and their answers
         const shuffledQuestionsData: QuizQuestionViewModel[] = shuffleArray(
-          initialQuiz.questions.map(question => ({
+          initialQuiz.questions.map((question) => ({
             ...question,
-            answers: shuffleArray(question.answers)
+            answers: shuffleArray(question.answers),
           }))
         );
 
@@ -109,44 +116,47 @@ export function useQuizPlay(initialQuiz: QuizDetailDTO): UseQuizPlayReturn {
     initializeQuiz();
   }, [initialQuiz]);
 
-  const handleAnswerSelect = useCallback((answerId: string) => {
-    if (quizPhase !== "playing" || shuffledQuestions.length === 0) return;
+  const handleAnswerSelect = useCallback(
+    (answerId: string) => {
+      if (quizPhase !== "playing" || shuffledQuestions.length === 0) return;
 
-    const currentQuestion = shuffledQuestions[currentQuestionIndex];
+      const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
-    // Record the user's answer
-    const newUserAnswer: UserAnswer = {
-      questionId: currentQuestion.id,
-      answerId,
-    };
+      // Record the user's answer
+      const newUserAnswer: UserAnswer = {
+        questionId: currentQuestion.id,
+        answerId,
+      };
 
-    setUserAnswers(prev => [...prev, newUserAnswer]);
+      setUserAnswers((prev) => [...prev, newUserAnswer]);
 
-    // Check if this is the last question
-    if (currentQuestionIndex >= shuffledQuestions.length - 1) {
-      // Quiz finished - save answers and redirect
-      setQuizPhase("finished");
+      // Check if this is the last question
+      if (currentQuestionIndex >= shuffledQuestions.length - 1) {
+        // Quiz finished - save answers and redirect
+        setQuizPhase("finished");
 
-      // Save answers to sessionStorage for results page
-      try {
-        sessionStorage.setItem(`quiz-${initialQuiz.id}-answers`, JSON.stringify([...userAnswers, newUserAnswer]));
-        sessionStorage.setItem(`quiz-${initialQuiz.id}-questions`, JSON.stringify(shuffledQuestions));
-      } catch (error) {
-        logger.error("Failed to save quiz session data", {
-          error: {
-            message: error instanceof Error ? error.message : String(error),
-            details: { quizId: initialQuiz.id },
-          },
-        });
+        // Save answers to sessionStorage for results page
+        try {
+          sessionStorage.setItem(`quiz-${initialQuiz.id}-answers`, JSON.stringify([...userAnswers, newUserAnswer]));
+          sessionStorage.setItem(`quiz-${initialQuiz.id}-questions`, JSON.stringify(shuffledQuestions));
+        } catch (error) {
+          logger.error("Failed to save quiz session data", {
+            error: {
+              message: error instanceof Error ? error.message : String(error),
+              details: { quizId: initialQuiz.id },
+            },
+          });
+        }
+
+        // Redirect to results page
+        window.location.assign(`/quizzes/${initialQuiz.id}/results`);
+      } else {
+        // Move to next question
+        setCurrentQuestionIndex((prev) => prev + 1);
       }
-
-      // Redirect to results page
-      window.location.assign(`/quizzes/${initialQuiz.id}/results`);
-    } else {
-      // Move to next question
-      setCurrentQuestionIndex(prev => prev + 1);
-    }
-  }, [quizPhase, shuffledQuestions, currentQuestionIndex, userAnswers, initialQuiz.id]);
+    },
+    [quizPhase, shuffledQuestions, currentQuestionIndex, userAnswers, initialQuiz.id]
+  );
 
   return {
     quizPhase,

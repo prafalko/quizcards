@@ -9,12 +9,7 @@ interface QuizPlayViewProps {
 }
 
 export function QuizPlayView({ initialQuiz }: QuizPlayViewProps) {
-  const {
-    quizPhase,
-    shuffledQuestions,
-    currentQuestionIndex,
-    handleAnswerSelect,
-  } = useQuizPlay(initialQuiz);
+  const { quizPhase, shuffledQuestions, currentQuestionIndex, handleAnswerSelect } = useQuizPlay(initialQuiz);
 
   // Loading state
   if (quizPhase === "loading") {
@@ -45,7 +40,9 @@ export function QuizPlayView({ initialQuiz }: QuizPlayViewProps) {
         <div className="text-center py-12">
           <p className="text-destructive text-lg mb-2">Ten quiz nie zawiera żadnych pytań</p>
           <p className="text-muted-foreground text-sm">
-            <a href="/" className="underline hover:no-underline">Wróć do panelu głównego</a>
+            <a href="/" className="underline hover:no-underline">
+              Wróć do panelu głównego
+            </a>
           </p>
         </div>
       </div>
@@ -61,7 +58,9 @@ export function QuizPlayView({ initialQuiz }: QuizPlayViewProps) {
         {/* Progress indicator */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Pytanie {currentQuestionIndex + 1} z {shuffledQuestions.length}</span>
+            <span>
+              Pytanie {currentQuestionIndex + 1} z {shuffledQuestions.length}
+            </span>
             <span>{Math.round(progressValue)}% ukończone</span>
           </div>
           <Progress value={progressValue} className="h-2" />
@@ -71,10 +70,7 @@ export function QuizPlayView({ initialQuiz }: QuizPlayViewProps) {
         <QuestionDisplay questionText={currentQuestion.question_text} />
 
         {/* Answer options */}
-        <AnswerOptions
-          answers={currentQuestion.answers}
-          onSelect={handleAnswerSelect}
-        />
+        <AnswerOptions answers={currentQuestion.answers} onSelect={handleAnswerSelect} />
       </div>
     </div>
   );
