@@ -38,14 +38,14 @@ Struktura ta prowadzi użytkownika krok po kroku przez główny proces: import f
 
 ### Widok 3: Edycja Quizu
 - **Nazwa widoku:** Edycja Quizu (Quiz Edit View)
-- **Ścieżka widoku:** `/quiz/:id/edit`
+- **Ścieżka widoku:** `/quizzes/:id/edit`
 - **Główny cel:** Umożliwienie użytkownikowi przeglądu, modyfikacji i weryfikacji pytań oraz odpowiedzi wygenerowanych przez AI.
 - **Kluczowe informacje do wyświetlenia:** Edytowalny tytuł quizu, lista wszystkich pytań z edytowalnymi polami tekstowymi dla pytania i czterech odpowiedzi.
 - **Kluczowe komponenty widoku:**
   - `EditableTitle`: Nagłówek `h1`, który po kliknięciu zmienia się w pole `input` do edycji tytułu.
   - `QuestionEditList`: Lista formularzy do edycji poszczególnych pytań.
   - `QuestionEditForm`: Formularz dla jednego pytania, zawierający pole `textarea` dla pytania, cztery pola `input` dla odpowiedzi oraz przyciski: "Generuj odpowiedzi ponownie" i "Usuń pytanie".
-  - `SaveChangesBar`: Pasek na górze lub dole strony z przyciskiem "Zapisz i opublikuj", informujący o niezapisanych zmianach.
+  - `SaveChangesBar`: Pasek na górze lub dole strony z przyciskiem "Zapisz", informujący o niezapisanych zmianach.
 - **UX, dostępność i względy bezpieczeństwa:**
   - **UX:** Zmiany są zapisywane w sposób wsadowy, co minimalizuje liczbę zapytań do API.
   - **Dostępność:** Wszystkie pola formularzy mają etykiety. Akcje są dostępne z klawiatury.
@@ -53,7 +53,7 @@ Struktura ta prowadzi użytkownika krok po kroku przez główny proces: import f
 
 ### Widok 4: Rozwiązywanie Quizu
 - **Nazwa widoku:** Rozwiązywanie Quizu (Quiz Solving View)
-- **Ścieżka widoku:** `/quiz/:id/play`
+- **Ścieżka widoku:** `/quizzes/:id/play`
 - **Główny cel:** Przeprowadzenie użytkownika przez proces odpowiadania na pytania w quizie.
 - **Kluczowe informacje do wyświetlenia:** Treść aktualnego pytania, cztery losowo ułożone odpowiedzi do wyboru, wskaźnik postępu (np. "Pytanie 5/20").
 - **Kluczowe komponenty widoku:**
@@ -67,7 +67,7 @@ Struktura ta prowadzi użytkownika krok po kroku przez główny proces: import f
 
 ### Widok 5: Podsumowanie Wyników
 - **Nazwa widoku:** Podsumowanie Wyników (Quiz Results View)
-- **Ścieżka widoku:** `/quiz/:id/results`
+- **Ścieżka widoku:** `/quizzes/:id/results`
 - **Główny cel:** Prezentacja wyników po zakończeniu quizu, umożliwiająca analizę błędów.
 - **Kluczowe informacje do wyświetlenia:** Wynik procentowy, lista wszystkich pytań z wizualnym oznaczeniem poprawnej odpowiedzi, odpowiedzi udzielonej przez użytkownika oraz odpowiedzi błędnych.
 - **Kluczowe komponenty widoku:**
@@ -86,11 +86,11 @@ Główna ścieżka użytkownika (happy path) wygląda następująco:
 
 1.  **Uwierzytelnienie:** Użytkownik loguje się lub rejestruje (`Widok Logowania / Rejestracji`), po czym zostaje przekierowany do `Panelu Głównego`.
 2.  **Generowanie:** W `Panelu Głównym` wkleja link do Quizlet i klika "Generuj". Aplikacja pokazuje stan ładowania.
-3.  **Weryfikacja i Edycja:** Po pomyślnym utworzeniu quizu, użytkownik jest automatycznie przenoszony do `Widoku Edycji Quizu` (`/quiz/:id/edit`). Tutaj przegląda i modyfikuje pytania, a na koniec klika "Zapisz i opublikuj".
+3.  **Weryfikacja i Edycja:** Po pomyślnym utworzeniu quizu, użytkownik jest automatycznie przenoszony do `Widoku Edycji Quizu` (`/quizzes/:id/edit`). Tutaj przegląda i modyfikuje pytania, a na koniec klika "Zapisz".
 4.  **Powrót do Panelu:** Po zapisaniu zmian, jest przekierowywany z powrotem do `Panelu Głównego`, gdzie nowy quiz jest widoczny na liście.
 5.  **Rozpoczęcie:** Użytkownik klika "Rozpocznij" na karcie wybranego quizu.
-6.  **Rozwiązywanie:** Zostaje przeniesiony do `Widoku Rozwiązywania Quizu` (`/quiz/:id/play`) i odpowiada na wszystkie pytania.
-7.  **Wyniki:** Po ostatnim pytaniu następuje automatyczne przekierowanie do `Widoku Podsumowania Wyników` (`/quiz/:id/results`).
+6.  **Rozwiązywanie:** Zostaje przeniesiony do `Widoku Rozwiązywania Quizu` (`/quizzes/:id/play`) i odpowiada na wszystkie pytania.
+7.  **Wyniki:** Po ostatnim pytaniu następuje automatyczne przekierowanie do `Widoku Podsumowania Wyników` (`/quizzes/:id/results`).
 8.  **Zakończenie:** Z widoku wyników użytkownik może wrócić do `Panelu Głównego`.
 
 ## 4. Układ i struktura nawigacji

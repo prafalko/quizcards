@@ -45,7 +45,6 @@ async function testPatchAnswer() {
   let validAnswerId: string | null = null;
   let originalAnswerText: string | null = null;
   let originalAnswerSource: string | null = null;
-  let parentQuestionId: string | null = null;
 
   try {
     // First, get list of quizzes
@@ -79,7 +78,7 @@ async function testPatchAnswer() {
     // Get the first question and fetch its details to get answers
     const firstQuestionId = quizWithQuestions.questions[0].id;
     const questionResponse = await fetch(`${BASE_URL}/api/questions/${firstQuestionId}`);
-    const questionData = await questionResponse.json() as QuestionDetailDTO;
+    const questionData = (await questionResponse.json()) as QuestionDetailDTO;
 
     if (!questionResponse.ok || !questionData.answers || questionData.answers.length === 0) {
       console.log("❌ No answers found for the question. Please ensure you have a quiz with answers.");
@@ -88,7 +87,7 @@ async function testPatchAnswer() {
     }
 
     // Get the first incorrect answer (to avoid modifying the correct answer)
-    const incorrectAnswer = questionData.answers.find(answer => !answer.is_correct);
+    const incorrectAnswer = questionData.answers.find((answer) => !answer.is_correct);
     if (!incorrectAnswer) {
       console.log("❌ No incorrect answers found. All answers are marked as correct.");
       console.log("   This might indicate test data issues.\n");
@@ -98,7 +97,6 @@ async function testPatchAnswer() {
     validAnswerId = incorrectAnswer.id;
     originalAnswerText = incorrectAnswer.answer_text;
     originalAnswerSource = incorrectAnswer.source;
-    parentQuestionId = firstQuestionId;
 
     console.log(`✅ Found answer ID: ${validAnswerId}`);
     console.log(`   From quiz: "${quizWithQuestions.title}"`);
@@ -143,11 +141,11 @@ async function testPatchAnswer() {
       }
 
       // Verify source changed from 'ai' to 'ai-edited' if it was originally 'ai'
-      if (originalAnswerSource === 'ai' && answer.source === 'ai-edited') {
+      if (originalAnswerSource === "ai" && answer.source === "ai-edited") {
         console.log(`   ✓ Source correctly changed from 'ai' to 'ai-edited'`);
-      } else if (originalAnswerSource === 'ai' && answer.source !== 'ai-edited') {
+      } else if (originalAnswerSource === "ai" && answer.source !== "ai-edited") {
         console.log(`   ❌ Source should have changed from 'ai' to 'ai-edited'`);
-      } else if (originalAnswerSource !== 'ai') {
+      } else if (originalAnswerSource !== "ai") {
         console.log(`   ✓ Source unchanged (was not 'ai')`);
       }
 
@@ -376,7 +374,7 @@ async function testPatchAnswer() {
   console.log();
 
   // Test 9: Test AI source change behavior (if answer was originally 'ai')
-  if (originalAnswerSource === 'ai') {
+  if (originalAnswerSource === "ai") {
     console.log(`Test 9: PATCH /api/answers/${validAnswerId} to verify AI source change behavior`);
     const aiTestText = `AI Source Test - ${Date.now()}`;
     try {
@@ -398,7 +396,7 @@ async function testPatchAnswer() {
         console.log(`✅ SUCCESS: Answer updated`);
         console.log(`   Source changed to: "${answer.source}"`);
 
-        if (answer.source === 'ai-edited') {
+        if (answer.source === "ai-edited") {
           console.log(`   ✓ Source correctly changed to 'ai-edited'`);
         } else {
           console.log(`   ❌ Source should have been 'ai-edited'`);

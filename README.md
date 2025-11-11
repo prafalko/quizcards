@@ -58,6 +58,7 @@ Environment variables (e.g. Supabase keys, Gemini API key) should be placed in a
 | `npm run lint`     | Run ESLint over the codebase           |
 | `npm run lint:fix` | Run ESLint with `--fix`                |
 | `npm run format`   | Format code with Prettier              |
+| `npm run test:api` | Run (all) manual tests scripts         |
 
 ### Manual API Tests
 
@@ -84,7 +85,7 @@ Out-of-scope for MVP:
 
 ## Project Status
 
-![version](https://img.shields.io/badge/version-0.0.2-blue?style=flat-square)
+![version](https://img.shields.io/badge/version-0.1.0-blue?style=flat-square)
 
 The project is in active **MVP development** — core features are being built and are not yet production-ready. Contributions are welcome via Pull Requests.
 

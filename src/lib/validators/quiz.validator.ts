@@ -4,6 +4,22 @@ import { ValidationError } from "../errors";
 /**
  * Validator for CreateQuizCommand
  * Validates the request body for POST /api/quizzes/generate
+ *
+ * Supported Quizlet URL formats:
+ * - https://quizlet.com/{set_id}/{title}/
+ * - https://quizlet.com/{language_code}/{set_id}/{title}/
+ * - https://www.quizlet.com/{set_id}/{title}/
+ * - https://www.quizlet.com/{language_code}/{set_id}/{title}/
+ *
+ * Where:
+ * - language_code: 2-letter language code (optional, e.g., "pl", "en")
+ * - set_id: numeric set identifier (required)
+ * - title: URL-friendly title (optional, ignored during processing)
+ *
+ * Examples:
+ * - https://quizlet.com/123456789/biology-cells-flash-cards/
+ * - https://quizlet.com/pl/870889722/tasiemce-flash-cards/
+ * - https://www.quizlet.com/en/555666777/chemistry-elements/
  */
 export const validateGenerateQuizCommand = z.object({
   source_url: z
@@ -22,11 +38,14 @@ export const validateGenerateQuizCommand = z.object({
     )
     .refine(
       (url) => {
-        // URL should match pattern: https://quizlet.com/{id}/{set-name}/
-        const regex = /^https:\/\/(www\.)?quizlet\.com\/\d+\/.+/;
+        // URL should match pattern: https://quizlet.com/{optional_language}/{set_id}/{optional_title}/
+        // Language code (optional): e.g., "pl", "en", etc.
+        // Set ID (required): numeric identifier
+        // Title and other segments (optional): ignored
+        const regex = /^https:\/\/(www\.)?quizlet\.com\/(?:[a-z]{2}\/)?(\d+)(?:\/.*)?\/?$/;
         return regex.test(url);
       },
-      { message: "Invalid Quizlet set URL format" }
+      { message: "Invalid Quizlet set URL format. URL must contain a valid set ID." }
     ),
   title: z.string().min(1, "Title cannot be empty").max(200, "Title is too long").optional(),
 });
@@ -43,9 +62,19 @@ export const validateQuizzesListQueryParams = z.object({
  * Validator for UpdateQuizCommand
  * Validates the request body for PATCH /api/quizzes/:id
  */
-export const validateUpdateQuizCommand = z.object({
-  title: z.string().min(1, "Title cannot be empty").max(255, "Title must not exceed 255 characters").trim(),
-});
+export const validateUpdateQuizCommand = z
+  .object({
+    title: z
+      .string()
+      .min(1, "Title cannot be empty")
+      .max(255, "Title must not exceed 255 characters")
+      .trim()
+      .optional(),
+    status: z.enum(["draft", "published"]).optional(),
+  })
+  .refine((data) => data.title !== undefined || data.status !== undefined, {
+    message: "At least one field (title or status) must be provided",
+  });
 
 /**
  * Validator for UpdateQuestionCommand

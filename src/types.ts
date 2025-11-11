@@ -84,10 +84,10 @@ export interface CreateQuizCommand {
 
 /**
  * Update quiz command - request to update quiz properties
- * Currently only title can be updated
  */
 export interface UpdateQuizCommand {
-  title: string;
+  title?: string;
+  status?: quiz_status;
 }
 
 /**
@@ -171,6 +171,56 @@ export interface QuestionMetadata {
   seed?: number;
   prompt: string; // The prompt used to generate incorrect answers
   regenerated_at?: string; // ISO timestamp of last regeneration
+}
+
+// ============================================================================
+// ViewModel Types for Quiz Play Interface
+// ============================================================================
+
+/**
+ * Answer ViewModel - represents a single answer in the quiz play UI
+ * Same as AnswerDTO but typed for clarity in UI context
+ */
+export type QuizAnswerViewModel = AnswerDTO;
+
+/**
+ * Question ViewModel - represents a question with randomly shuffled answers
+ * Omits quiz_id as it's implied by the current quiz context
+ */
+export type QuizQuestionViewModel = Omit<QuestionDetailDTO, "quiz_id"> & {
+  answers: QuizAnswerViewModel[]; // Answers in random order for quiz play
+};
+
+/**
+ * User Answer - stores information about an answer selected by the user
+ */
+export interface UserAnswer {
+  questionId: string;
+  answerId: string;
+}
+
+// ============================================================================
+// ViewModel Types for Quiz Results Interface
+// ============================================================================
+
+/**
+ * Represents the status of an answer in the results view
+ */
+export type AnswerStatus = "correct" | "user_incorrect" | "neutral";
+
+/**
+ * Answer ViewModel for the results view - extends AnswerDTO with a status
+ */
+export interface ResultAnswerViewModel extends AnswerDTO {
+  status: AnswerStatus;
+}
+
+/**
+ * Question ViewModel for the results view - includes user's answer and answer statuses
+ */
+export interface ResultQuestionViewModel extends QuestionDetailDTO {
+  userAnswerId: string | null;
+  answers: ResultAnswerViewModel[];
 }
 
 // ============================================================================

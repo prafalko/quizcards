@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { ThemeToggle } from "../components/ui/theme-toggle.tsx";
 
 interface Props {
   title?: string;
@@ -13,12 +14,14 @@ const { title = "10x Astro Starter" } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <script is:inline src="/theme-init.js"></script>
   </head>
   <body>
     <slot />
+    <ThemeToggle client:load />
   </body>
 </html>
 
