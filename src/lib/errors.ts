@@ -156,6 +156,42 @@ export class RateLimitError extends AppError {
 }
 
 /**
+ * API Key error for missing or invalid API key
+ */
+export class ApiKeyError extends AppError {
+  constructor(message = "API key is missing or invalid", correlationId?: string) {
+    super("INTERNAL_ERROR", message, 500, undefined, correlationId);
+  }
+}
+
+/**
+ * API Generation error for AI service generation failures
+ */
+export class ApiGenerationError extends AppError {
+  constructor(message: string, details?: Record<string, unknown>, correlationId?: string) {
+    super("AI_GENERATION_FAILED", message, 500, details, correlationId);
+  }
+}
+
+/**
+ * Invalid Response Data error for AI response validation failures
+ */
+export class InvalidResponseDataError extends AppError {
+  constructor(message: string, details?: Record<string, unknown>, correlationId?: string) {
+    super("AI_GENERATION_FAILED", message, 500, details, correlationId);
+  }
+}
+
+/**
+ * Content Blocked error for AI content safety filter blocks
+ */
+export class ContentBlockedError extends AppError {
+  constructor(message: string, details?: Record<string, unknown>, correlationId?: string) {
+    super("AI_GENERATION_FAILED", message, 500, details, correlationId);
+  }
+}
+
+/**
  * PostgreSQL/Supabase error interface
  */
 interface DatabaseErrorLike {

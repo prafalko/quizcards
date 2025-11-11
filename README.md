@@ -85,7 +85,7 @@ Out-of-scope for MVP:
 
 ## Project Status
 
-![version](https://img.shields.io/badge/version-0.1.0-blue?style=flat-square)
+![version](https://img.shields.io/badge/version-0.1.1-blue?style=flat-square)
 
 The project is in active **MVP development** — core features are being built and are not yet production-ready. Contributions are welcome via Pull Requests.
 
