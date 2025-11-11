@@ -64,7 +64,7 @@ export function EditableTitle({ initialTitle, onChange }: EditableTitleProps) {
         onChange={handleChange}
         onBlur={handleBlur}
         onKeyDown={handleInputKeyDown}
-        className="text-2xl font-bold tracking-tight h-auto p-1 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="!text-3xl !font-bold !tracking-tight h-auto px-4 py-3 border border-primary bg-card rounded-lg shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         placeholder="Wprowadź tytuł quizu..."
       />
     );
@@ -80,7 +80,7 @@ export function EditableTitle({ initialTitle, onChange }: EditableTitleProps) {
   return (
     <button
       type="button"
-      className="text-2xl font-bold tracking-tight cursor-pointer hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded text-left bg-transparent border-none p-0"
+      className="w-full text-3xl font-bold tracking-tight cursor-pointer hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg px-4 py-3 text-left bg-card border border-border shadow-sm hover:border-primary/50"
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       title="Kliknij, aby edytować tytuł"
