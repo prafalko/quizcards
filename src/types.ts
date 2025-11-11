@@ -174,6 +174,32 @@ export interface QuestionMetadata {
 }
 
 // ============================================================================
+// ViewModel Types for Quiz Play Interface
+// ============================================================================
+
+/**
+ * Answer ViewModel - represents a single answer in the quiz play UI
+ * Same as AnswerDTO but typed for clarity in UI context
+ */
+export type QuizAnswerViewModel = AnswerDTO;
+
+/**
+ * Question ViewModel - represents a question with randomly shuffled answers
+ * Omits quiz_id as it's implied by the current quiz context
+ */
+export type QuizQuestionViewModel = Omit<QuestionDetailDTO, "quiz_id"> & {
+  answers: QuizAnswerViewModel[]; // Answers in random order for quiz play
+};
+
+/**
+ * User Answer - stores information about an answer selected by the user
+ */
+export interface UserAnswer {
+  questionId: string;
+  answerId: string;
+}
+
+// ============================================================================
 // External Service Types (Quizlet, AI)
 // ============================================================================
 

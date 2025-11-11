@@ -144,6 +144,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - Użytkownik może wybrać tylko jedną odpowiedź na pytanie.
   - Po wybraniu odpowiedzi, użytkownik przechodzi do następnego pytania.
   - Informacja zwrotna o poprawności odpowiedzi nie jest wyświetlana w trakcie quizu.
+  - Jeśli status quizu to 'draft' to zmienia się na opublikowany ('published') w momencie pierwszego uruchomienia trybu rozwiązywania quizu.
 
 - ID: US-013
 - Tytuł: Zakończenie quizu i przeglądanie wyników

@@ -1,0 +1,63 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { QuizPlayView } from "../../../components/QuizPlayView";
+import type { QuizDetailDTO } from "../../../types";
+import { logger } from "../../../lib/services/logger.service";
+
+// Konfiguracja dla hybrid rendering - ta strona będzie server-side rendered
+export const prerender = false;
+
+// Pobranie danych quizu po stronie serwera
+let quiz: QuizDetailDTO | null = null;
+let error: string | null = null;
+
+try {
+  const { id } = Astro.params;
+
+  if (!id) {
+    error = "Nieprawidłowy identyfikator quizu";
+  } else {
+    const response = await fetch(`${Astro.url.origin}/api/quizzes/${id}`);
+
+    if (response.ok) {
+      quiz = await response.json();
+    } else if (response.status === 404) {
+      error = "Quiz nie został znaleziony";
+    } else {
+      error = "Nie udało się pobrać danych quizu";
+      logger.error("Failed to fetch quiz", {
+        error: {
+          message: `HTTP ${response.status}: ${response.statusText}`,
+          details: { status: response.status, quizId: id },
+        },
+      });
+    }
+  }
+} catch (e) {
+  error = "Błąd połączenia z serwerem";
+  logger.error("Failed to fetch quiz", {
+    error: {
+      message: e instanceof Error ? e.message : String(e),
+      stack: e instanceof Error ? e.stack : undefined,
+      details: { quizId: Astro.params.id },
+    },
+  });
+}
+---
+
+<Layout title={`QuizCards - ${quiz?.title || "Rozwiąż quiz"}`}>
+  <div class="container mx-auto px-1 py-4 max-w-2xl">
+    <div class="text-center py-1">
+      <p class="text-destructive text-lg mb-2">{error}</p>
+      <div class="flex justify-center">
+        <a
+          href="/"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+        >
+          Powróć do panelu głównego
+        </a>
+      </div>
+    </div>
+  </div>
+  {quiz && !error && <QuizPlayView client:load initialQuiz={quiz} />}
+</Layout>
