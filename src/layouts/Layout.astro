@@ -17,6 +17,7 @@ const { title = "10x Astro Starter" } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <script is:inline src="/theme-init.js"></script>
   </head>
   <body>
     <slot />
