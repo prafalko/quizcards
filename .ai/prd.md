@@ -44,6 +44,8 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - Formularz rejestracji zawiera pola na login i hasło.
   - Po pomyślnej rejestracji, użytkownik jest automatycznie zalogowany i przekierowany do panelu głównego.
   - W przypadku, gdy użytkownik o podanym loginie już istnieje, wyświetlany jest odpowiedni komunikat błędu.
+  - Jeśli żaden użytkownik nie jest obecnie zalogowany to każdy widok powinien przekierowywać do widoku rejestracji/logowania.
+  - Żadna fukcjonalność inna niż logowanie/rejestracja nie powinna być dostępna dla niezalogowanych użytkowników, w szczególności funkcjonalności opisane w historyjkach od US-004 do US-013
 
 - ID: US-002
 - Tytuł: Logowanie do aplikacji
@@ -52,6 +54,8 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - Formularz logowania zawiera pola na login i hasło.
   - Po pomyślnym zalogowaniu, użytkownik jest przekierowany do panelu głównego (listy quizów).
   - W przypadku podania nieprawidłowych danych, wyświetlany jest odpowiedni komunikat błędu.
+  - Jeśli żaden użytkownik nie jest obecnie zalogowany to każdy widok powinien przekierowywać do widoku rejestracji/logowania.
+  - Żadna fukcjonalność inna niż logowanie/rejestracja nie powinna być dostępna dla niezalogowanych użytkowników, w szczególności funkcjonalności opisane w historyjkach od US-004 do US-013
 
 - ID: US-003
 - Tytuł: Wylogowanie z aplikacji
@@ -59,6 +63,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
 - Kryteria akceptacji:
   - W interfejsie użytkownika znajduje się przycisk "Wyloguj".
   - Po kliknięciu przycisku, sesja użytkownika jest kończona i jest on przekierowywany na stronę logowania.
+  - Odzyskiwanie hasła powinno być możliwe.
 
 ### Generowanie i Zarządzanie Quizami
 
@@ -72,6 +77,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - Domyślna liczba pytań w quizie jest równa liczbie fiszek w zestawie.
   - Nowo wygenerowany quiz ma status szkicu (draft).
   - Wygenerowany quiz zostaje wyświetlony w widoku edycji.
+  - Funkcjonalność nie jest dostępna dla niezalogowanych użytkowników.
 
 - ID: US-005
 - Tytuł: Obsługa nieprawidłowego linku Quizlet
@@ -80,6 +86,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - System weryfikuje, czy podany link prowadzi do publicznego i istniejącego zestawu fiszek na Quizlet.
   - W przypadku podania linku do prywatnego zestawu, wyświetlany jest komunikat: "Nie można zaimportować zestawu. Upewnij się, że zestaw jest publiczny."
   - W przypadku podania nieprawidłowego linku lub linku do pustego zestawu, wyświetlany jest odpowiedni komunikat błędu.
+  - Funkcjonalność nie jest dostępna dla niezalogowanych użytkowników.
 
 - ID: US-006
 - Tytuł: Przeglądanie listy quizów
@@ -88,6 +95,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - Na stronie głównej po zalogowaniu wyświetlana jest lista quizów.
   - Każdy element na liście pokazuje tytuł quizu oraz liczbę pytań.
   - Lista jest posortowana od najnowszego do najstarszego.
+  - Funkcjonalność nie jest dostępna dla niezalogowanych użytkowników.
 
 - ID: US-007
 - Tytuł: Edycja tytułu quizu
@@ -95,6 +103,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
 - Kryteria akceptacji:
   - Na liście quizów lub w widoku edycji quizu istnieje opcja zmiany tytułu.
   - Po zapisaniu, nowy tytuł jest widoczny na liście quizów i w widoku quizu.
+  - Funkcjonalność nie jest dostępna dla niezalogowanych użytkowników.
 
 - ID: US-008
 - Tytuł: Usuwanie quizu
@@ -103,6 +112,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - Na liście quizów przy każdym quizie znajduje się opcja usunięcia.
   - Przed ostatecznym usunięciem quizu, system wyświetla okno dialogowe z prośbą o potwierdzenie.
   - Po potwierdzeniu, quiz jest trwale usuwany z mojego konta i znika z listy.
+  - Funkcjonalność nie jest dostępna dla niezalogowanych użytkowników.
 
 ### Edycja Pytań
 
@@ -115,6 +125,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - W trybie edycji, pierwsza odpowiedź jest zawsze oznaczona jako poprawna.
   - Zmiany muszą zostać zapisane, aby zostały uwzględnione w quizie.
   - Quiz ma status szkicu ('draft') po wygenerowaniu i może być edytowany. Status zmienia się na opublikowany ('published') w momencie pierwszego rozwiązania quizu.
+  - Funkcjonalność nie jest dostępna dla niezalogowanych użytkowników.
 
 - ID: US-010
 - Tytuł: Ponowne generowanie odpowiedzi
@@ -122,6 +133,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
 - Kryteria akceptacji:
   - W widoku edycji pytania znajduje się przycisk "Generuj odpowiedzi ponownie".
   - Po kliknięciu, AI generuje nowy zestaw trzech fałszywych odpowiedzi, nie zmieniając pytania i poprawnej odpowiedzi.
+  - Funkcjonalność nie jest dostępna dla niezalogowanych użytkowników.
 
 - ID: US-011
 - Tytuł: Usuwanie pytania z quizu
@@ -130,6 +142,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - W widoku edycji quizu przy każdym pytaniu znajduje się opcja jego usunięcia.
   - Przed usunięciem pytania, system wyświetla okno dialogowe z prośbą o potwierdzenie.
   - Po potwierdzeniu, pytanie jest trwale usuwane z quizu.
+  - Funkcjonalność nie jest dostępna dla niezalogowanych użytkowników.
 
 ### Rozwiązywanie Quizu
 
@@ -145,6 +158,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - Po wybraniu odpowiedzi, użytkownik przechodzi do następnego pytania.
   - Informacja zwrotna o poprawności odpowiedzi nie jest wyświetlana w trakcie quizu.
   - Jeśli status quizu to 'draft' to zmienia się na opublikowany ('published') w momencie pierwszego uruchomienia trybu rozwiązywania quizu.
+  - Funkcjonalność nie jest dostępna dla niezalogowanych użytkowników.
 
 - ID: US-013
 - Tytuł: Zakończenie quizu i przeglądanie wyników
@@ -155,6 +169,7 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
   - Podsumowanie wyświetla listę wszystkich pytań.
   - Na liście pytań zaznaczona jest odpowiedź udzielona przez użytkownika oraz wskazana jest odpowiedź poprawna.
   - Na ekranie podsumowania znajduje się przycisk pozwalający wrócić do listy quizów.
+  - Funkcjonalność nie jest dostępna dla niezalogowanych użytkowników.
 
 ## 6. Metryki sukcesu
 
