@@ -26,19 +26,35 @@ export const generateIncorrectAnswersResponseSchema = z.object({
 export type GenerateIncorrectAnswersResponse = z.infer<typeof generateIncorrectAnswersResponseSchema>;
 
 // ============================================================================
-// Future validators can be added here
+// Batch Quiz Generation (from flashcards)
 // ============================================================================
 
 /**
- * Example: Schema for quiz generation (if needed in the future)
+ * Schema for a single generated question in batch mode
+ * Validates that each question has the correct structure with exactly 3 incorrect answers
  */
-// export const generateQuizResponseSchema = z.object({
-//   title: z.string(),
-//   questions: z.array(
-//     z.object({
-//       question: z.string(),
-//       correctAnswer: z.string(),
-//       incorrectAnswers: z.array(z.string()).length(3),
-//     })
-//   ),
-// });
+const GeneratedQuestionSchema = z.object({
+  question: z.string().min(1, "Question text must not be empty").describe("Original question from flashcard"),
+  correctAnswer: z.string().min(1, "Correct answer must not be empty").describe("Correct answer from flashcard"),
+  incorrectAnswers: z
+    .array(z.string().min(1, "Answer must not be empty"))
+    .length(3, "Must generate exactly 3 incorrect answers")
+    .describe("Array of exactly 3 generated incorrect answer options"),
+});
+
+/**
+ * Schema for complete quiz generation response
+ * Validates that AI returns a title and array of questions
+ */
+export const GeneratedQuizSchema = z.object({
+  title: z
+    .string()
+    .min(1, "Quiz title must not be empty")
+    .describe("Quiz title generated based on topic and flashcards"),
+  questions: z.array(GeneratedQuestionSchema).min(1, "Must generate at least one question"),
+});
+
+/**
+ * Type for validated generated quiz response
+ */
+export type GeneratedQuiz = z.infer<typeof GeneratedQuizSchema>;

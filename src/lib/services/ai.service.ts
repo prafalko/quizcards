@@ -1,10 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import type { QuestionMetadata } from "../../types";
+import type { QuestionMetadata, QuizletFlashcard } from "../../types";
 import { ApiKeyError, ApiGenerationError, InvalidResponseDataError, ContentBlockedError, AppError } from "../errors";
 import { createLogger, type LoggerService } from "./logger.service";
-import { generateIncorrectAnswersResponseSchema } from "../validators/ai.validator";
+import {
+  generateIncorrectAnswersResponseSchema,
+  GeneratedQuizSchema,
+  type GeneratedQuiz,
+} from "../validators/ai.validator";
 
 /**
  * AI Service - handles generation of structured data using Google Gemini
@@ -294,6 +298,104 @@ Return the incorrect answers as an array of strings.`;
       seed,
       prompt: `${systemPrompt}\n\n${userPrompt}`,
       regenerated_at: new Date().toISOString(),
+    },
+  };
+}
+
+// ============================================================================
+// Public API for generating complete quiz from flashcards (batch processing)
+// ============================================================================
+
+export interface GenerateQuizFromFlashcardsInput {
+  flashcards: QuizletFlashcard[];
+  topic: string;
+  temperature?: number;
+  seed?: number;
+}
+
+export interface GenerateQuizFromFlashcardsOutput {
+  quiz: GeneratedQuiz;
+  metadata: {
+    model: string;
+    temperature: number;
+    seed?: number;
+    flashcardsCount: number;
+    generatedAt: string;
+  };
+}
+
+/**
+ * Generates a complete quiz (title + questions with incorrect answers) from a list of flashcards
+ * Uses Google Gemini AI to process all flashcards in a single batch request
+ * This approach reduces API calls and prevents 429 rate limit errors
+ *
+ * @param input - Flashcards array, topic, and optional parameters
+ * @returns Complete quiz with title and questions with all answers
+ * @throws ApiKeyError, ApiGenerationError, InvalidResponseDataError, ContentBlockedError
+ */
+export async function generateQuizFromFlashcards(
+  input: GenerateQuizFromFlashcardsInput
+): Promise<GenerateQuizFromFlashcardsOutput> {
+  const { flashcards, topic, temperature = 0.7, seed } = input;
+
+  const logger = createLogger("AIService");
+  logger.info("Generating quiz from flashcards in batch mode", {
+    operation: "generateQuizFromFlashcards",
+    metadata: {
+      flashcardsCount: flashcards.length,
+      topic,
+      temperature,
+      hasSeed: seed !== undefined,
+    },
+  });
+
+  // Define the system prompt for generating complete quiz
+  const systemPrompt = `You are an expert at creating multiple-choice quiz questions.
+Your task is to generate a complete quiz based on a list of flashcards.
+Each flashcard contains a question and the correct answer. For each question, you must create 3 plausible but incorrect answer options (distractors).
+
+Guidelines for creating distractors:
+- They should be related to the topic and sound plausible
+- They should be clearly wrong to someone who knows the correct answer
+- They should be similar in length and format to the correct answer
+- They should be at an appropriate difficulty level (not too obvious, not too obscure)
+- Avoid joke answers or nonsensical options
+
+Based on the topic and flashcard content, also create a concise, catchy title for the entire quiz.`;
+
+  const userPrompt = `Quiz topic: ${topic}
+
+Generate a complete quiz based on the following flashcards.
+For each flashcard, include the original question (term), the correct answer (definition), and generate exactly 3 incorrect answers.
+
+Flashcards:
+${flashcards.map((f, i) => `${i + 1}. Term: "${f.term}", Definition: "${f.definition}"`).join("\n")}
+
+Return the quiz with a title and all questions with their answers.`;
+
+  // Generate quiz using Gemini with validated schema
+  const result = await geminiService.generateStructuredData(systemPrompt, userPrompt, GeneratedQuizSchema, {
+    temperature,
+    seed,
+  });
+
+  logger.info("Quiz generated successfully in batch mode", {
+    operation: "generateQuizFromFlashcards",
+    metadata: {
+      questionsCount: result.questions.length,
+      flashcardsCount: flashcards.length,
+      model: geminiService["modelName"],
+    },
+  });
+
+  return {
+    quiz: result,
+    metadata: {
+      model: geminiService["modelName"],
+      temperature,
+      seed,
+      flashcardsCount: flashcards.length,
+      generatedAt: new Date().toISOString(),
     },
   };
 }
