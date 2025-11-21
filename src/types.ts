@@ -229,6 +229,7 @@ export interface ResultQuestionViewModel extends QuestionDetailDTO {
 
 /**
  * Quizlet flashcard - represents a single term/definition pair from Quizlet
+ * Used also as input for AI quiz generation (term = question, definition = answer)
  */
 export interface QuizletFlashcard {
   term: string;

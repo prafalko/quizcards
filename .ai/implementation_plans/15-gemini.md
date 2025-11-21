@@ -7,10 +7,19 @@ Usługa `GeminiService` będzie stanowić centralny punkt integracji z API Googl
 Główne cele usługi:
 - **Enkapsulacja logiki:** Ukrycie złożoności interakcji z `@google/generative-ai` SDK.
 - **Generowanie treści:** Dostarczenie metod do generowania ustrukturyzowanych danych, takich jak quizy, na podstawie zapytań w języku naturalnym.
+- **Przetwarzanie wsadowe:** Optymalizacja zapytań do AI poprzez grupowanie wielu fiszek w jedno zapytanie, co znacząco redukuje koszty i zapobiega błędom `429 Too Many Requests`.
 - **Walidacja i bezpieczeństwo typów:** Zapewnienie, że dane zwracane przez usługę są zgodne z typami używanymi w aplikacji (np. schematami Zod).
 - **Obsługa błędów:** Implementacja solidnych mechanizmów obsługi błędów API i walidacji.
 
-## 2. Opis konstruktora
+## 2. Architektura Usługi
+
+Usługa zostanie podzielona na dwie warstwy:
+1.  **`GeminiService` (klasa):** Niskopoziomowa, generyczna klasa opakowująca SDK Gemini. Jej głównym zadaniem jest wykonanie zapytania i zwalidowanie odpowiedzi względem dowolnego schematu Zod. Jest reużywalna i nie posiada logiki biznesowej specyficznej dla QuizCards.
+2.  **Funkcje publiczne (`ai.service.ts`):** Wysokopoziomowe funkcje, takie jak `generateQuizFromFlashcards`, które wykorzystują instancję `GeminiService` do realizacji konkretnych zadań biznesowych. To tutaj definiowane są prompty i schematy odpowiedzi.
+
+## 3. Implementacja `GeminiService` (Klasa)
+
+### Konstruktor
 
 Konstruktor `GeminiService` będzie inicjalizował klienta Gemini API. Klucz API będzie pobierany ze zmiennych środowiskowych po stronie serwera, zgodnie z najlepszymi praktykami bezpieczeństwa.
 
@@ -37,9 +46,7 @@ const geminiApiKey = import.meta.env.GEMINI_API_KEY;
 export const geminiService = new GeminiService(geminiApiKey);
 ```
 
-## 3. Publiczne metody i pola
-
-### `generateStructuredData<T extends z.ZodTypeAny>(systemPrompt: string, userPrompt: string, schema: T): Promise<z.infer<T>>`
+### `generateStructuredData<T extends z.ZodTypeAny>(...)`
 
 Jest to generyczna metoda publiczna, która będzie głównym interfejsem usługi.
 
@@ -49,18 +56,18 @@ Jest to generyczna metoda publiczna, która będzie głównym interfejsem usług
     - `userPrompt` (string): Konkretne polecenie od użytkownika.
     - `schema` (T extends z.ZodTypeAny): Schemat Zod definiujący oczekiwaną strukturę odpowiedzi.
 - **Zwraca:** `Promise<z.infer<T>>` - Obiekt zgodny ze zdefiniowanym schematem.
-- **Rzuca błędy:** W przypadku problemów z API, walidacją lub filtrami bezpieczeństwa, metoda będzie rzucać customowe błędy (patrz sekcja 5. Obsługa błędów).
+- **Rzuca błędy:** W przypadku problemów z API, walidacją lub filtrami bezpieczeństwa, metoda będzie rzucać customowe błędy (patrz sekcja 6. Obsługa błędów).
 
-## 4. Prywatne metody i pola
+### Metody prywatne
 
-### `private getModel(generationConfig: object)`
+#### `private getModel(...)`
 
 - **Cel:** Inicjalizacja i zwrócenie instancji modelu generatywnego z odpowiednią konfiguracją.
 - **Parametry:**
     - `generationConfig` (object): Obiekt konfiguracyjny dla modelu (temperatura, `maxOutputTokens`, `responseMimeType` itp.).
 - **Zwraca:** Instancję `GenerativeModel`.
 
-### `private buildPrompt(systemPrompt: string, userPrompt: string, schema: z.ZodTypeAny): string`
+#### `private buildPrompt(...)`
 
 - **Cel:** Zbudowanie pełnego, sformatowanego promptu, który zawiera instrukcję systemową, zapytanie użytkownika oraz opis oczekiwanego schematu JSON.
 - **Parametry:**
@@ -69,7 +76,7 @@ Jest to generyczna metoda publiczna, która będzie głównym interfejsem usług
     - `schema` (z.ZodTypeAny): Schemat Zod do konwersji na schemat JSON i dołączenia do promptu.
 - **Zwraca:** Pełny prompt w formie stringa.
 
-### `private validateAndParseResponse<T extends z.ZodTypeAny>(response: string, schema: T): z.infer<T>`
+#### `private validateAndParseResponse(...)`
 
 - **Cel:** Parsowanie odpowiedzi tekstowej z API (która powinna być JSON-em) i walidacja jej względem podanego schematu Zod.
 - **Parametry:**
@@ -77,6 +84,17 @@ Jest to generyczna metoda publiczna, która będzie głównym interfejsem usług
     - `schema` (T extends z.ZodTypeAny): Schemat Zod do walidacji.
 - **Zwraca:** Sparsowany i zwalidowany obiekt.
 - **Rzuca błędy:** `InvalidResponseDataError`, jeśli odpowiedź nie jest poprawnym JSON-em lub nie jest zgodna ze schematem.
+
+## 4. Publiczna funkcja `generateQuizFromFlashcards`
+
+Ta funkcja będzie głównym punktem wejścia do generowania quizów w trybie wsadowym. Wykorzysta ona `geminiService` do komunikacji z AI.
+
+- **Cel:** Wygenerowanie kompletnego quizu (tytuł + pytania z dystraktorami) na podstawie listy fiszek.
+- **Parametry:**
+    - `flashcards` (Flashcard[]): Tablica obiektów zawierających `question` i `answer`.
+    - `topic` (string): Temat quizu, na podstawie którego AI może wygenerować tytuł.
+    - `generationConfig` (object, opcjonalnie): Konfiguracja dla modelu (np. `temperature`).
+- **Zwraca:** `Promise<GeneratedQuiz>` - Obiekt z tytułem i listą pytań zgodny ze zdefiniowanym schematem Zod.
 
 ## 5. Obsługa błędów
 
@@ -124,152 +142,122 @@ export class ContentBlockedError extends BaseError {}
 
 1.  W pliku `src/lib/errors.ts`, zdefiniuj customowe klasy błędów, jak opisano w sekcji 5.
 
-### Krok 3: Implementacja `GeminiService`
+### Krok 3: Implementacja `ai.service.ts`
 
-1.  Utwórz nowy plik `src/lib/services/ai.service.ts`.
-2.  Zaimplementuj klasę `GeminiService` zgodnie ze strukturą opisaną w sekcjach 2, 3 i 4.
+1.  Utwórz plik `src/lib/services/ai.service.ts` (jeśli nie istnieje).
+2.  Zaimplementuj klasę `GeminiService` zgodnie ze strukturą opisaną w sekcji 3.
+3.  Zdefiniuj schematy Zod i typy dla przetwarzania wsadowego. Umieść je w `src/lib/validators/ai.validator.ts`.
 
-**Implementacja `buildPrompt`:**
-
+**Schematy walidacji (`ai.validator.ts`):**
 ```typescript
-import { zodToJsonSchema } from "zod-to-json-schema";
-// ... wewnątrz klasy GeminiService
+import { z } from "zod";
 
-private buildPrompt(systemPrompt: string, userPrompt: string, schema: z.ZodTypeAny): string {
-  const jsonSchema = zodToJsonSchema(schema, "responseSchema");
+// Schemat dla pojedynczego wygenerowanego pytania
+const GeneratedQuestionSchema = z.object({
+  question: z.string().describe("Oryginalne pytanie z fiszki."),
+  correctAnswer: z.string().describe("Poprawna odpowiedź z fiszki."),
+  incorrectAnswers: z.array(z.string()).length(3).describe("Tablica trzech wygenerowanych, błędnych odpowiedzi."),
+});
 
-  return `${systemPrompt}
-
-  Zawsze odpowiadaj w formacie JSON. Użyj następującego schematu JSON:
-  ${JSON.stringify(jsonSchema, null, 2)}
-  
-  ---
-  
-  Zapytanie użytkownika:
-  ${userPrompt}`;
-}
+// Schemat dla całego quizu - to jest struktura, której oczekujemy od AI
+export const GeneratedQuizSchema = z.object({
+  title: z.string().describe("Tytuł quizu wygenerowany na podstawie tematu i fiszek."),
+  questions: z.array(GeneratedQuestionSchema),
+});
 ```
 
-**Implementacja `generateStructuredData`:**
+4.  Zaimplementuj publiczną funkcję `generateQuizFromFlashcards`.
 
+**Implementacja `generateQuizFromFlashcards` (`ai.service.ts`):**
 ```typescript
-// ... wewnątrz klasy GeminiService
+import { geminiService } from "./ai.service";
+import { GeneratedQuizSchema } from "../validators/ai.validator";
+import type { Flashcard } from "@/types"; // Zakładając, że typ Flashcard jest zdefiniowany globalnie
 
-async generateStructuredData<T extends z.ZodTypeAny>(
-  systemPrompt: string, 
-  userPrompt: string, 
-  schema: T
-): Promise<z.infer<T>> {
-  
-  const generationConfig = {
-    temperature: 0.7,
-    maxOutputTokens: 8192,
-    responseMimeType: "application/json",
-  };
+export async function generateQuizFromFlashcards(
+  flashcards: Flashcard[],
+  topic: string
+) {
+  const systemPrompt = `Jesteś ekspertem w tworzeniu quizów wielokrotnego wyboru. Twoim zadaniem jest wygenerowanie kompletnego quizu na podstawie dostarczonej listy fiszek.
+Każda fiszka zawiera pytanie i poprawną odpowiedź. Dla każdego pytania musisz stworzyć 3 wiarygodne, ale nieprawidłowe odpowiedzi (dystraktory).
+Dystraktory powinny być tematycznie powiązane z pytaniem, podobnej długości i formatu co poprawna odpowiedź.
+Na podstawie tematu i treści fiszek, stwórz również zwięzły, chwytliwy tytuł dla całego quizu.`;
 
-  const model = this.genAI.getGenerativeModel({
-    model: this.modelName,
-    generationConfig,
-  });
+  const userPrompt = `
+    Temat quizu: ${topic}
 
-  const prompt = this.buildPrompt(systemPrompt, userPrompt, schema);
+    Na podstawie poniższej listy fiszek, wygeneruj kompletny quiz.
+    Fiszki:
+    ${flashcards.map((f, i) => `${i + 1}. Pytanie: "${f.question}", Poprawna odpowiedź: "${f.answer}"`).join('\n')}
+  `;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-
-    if (!response.text) {
-        // Obsługa blokady treści lub pustej odpowiedzi
-        const safetyRatings = response.promptFeedback?.safetyRatings;
-        throw new ContentBlockedError(
-          `Content blocked due to safety ratings: ${JSON.stringify(safetyRatings)}`
-        );
-    }
-    
-    const text = response.text();
-    return this.validateAndParseResponse(text, schema);
-
-  } catch (error) {
-    if (error instanceof BaseError) throw error;
-    // Logowanie oryginalnego błędu
-    console.error("Gemini API generation error:", error);
-    throw new ApiGenerationError("Failed to generate content from Gemini API.");
-  }
-}
-
-private validateAndParseResponse<T extends z.ZodTypeAny>(
-  response: string,
-  schema: T
-): z.infer<T> {
-  try {
-    const data = JSON.parse(response);
-    const validationResult = schema.safeParse(data);
-    if (!validationResult.success) {
-      throw new InvalidResponseDataError(
-        `Response validation failed: ${validationResult.error.message}`,
-        { originalResponse: response }
-      );
-    }
-    return validationResult.data;
-  } catch (error) {
-    if (error instanceof InvalidResponseDataError) throw error;
-    throw new InvalidResponseDataError(
-      `Failed to parse JSON response: ${error.message}`,
-      { originalResponse: response }
+    const quizData = await geminiService.generateStructuredData(
+      systemPrompt,
+      userPrompt,
+      GeneratedQuizSchema
     );
+    return quizData;
+  } catch (error) {
+    // Logowanie i ponowne rzucenie błędu
+    console.error("Failed to generate quiz from flashcards", error);
+    // Rzuć błąd dalej, aby obsłużyć go w endpoincie
+    throw error;
   }
 }
 ```
 
 ### Krok 4: Integracja z endpointem API Astro
 
-1.  Zmodyfikuj istniejący lub utwórz nowy endpoint API w Astro, np. `src/pages/api/quizzes/generate.ts`.
-2.  Zaimportuj singleton `geminiService`.
-3.  Zdefiniuj schemat Zod dla oczekiwanej odpowiedzi (np. schemat quizu).
-4.  Zdefiniuj prompt systemowy i użytkownika.
-5.  Wywołaj `geminiService.generateStructuredData` wewnątrz bloku `try...catch` i obsłuż potencjalne błędy, zwracając odpowiednie statusy HTTP.
+1.  Zmodyfikuj endpoint API `src/pages/api/quizzes/generate.ts`, aby używał nowej funkcji wsadowej.
+2.  Endpoint powinien teraz przyjmować URL do Quizlet, pobierać z niego fiszki (przy użyciu `quizlet.service`), a następnie przekazywać je do `generateQuizFromFlashcards`.
 
 **Przykład endpointu `generate.ts`:**
 
 ```typescript:src/pages/api/quizzes/generate.ts
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { geminiService } from "@/lib/services/ai.service";
+import { generateQuizFromFlashcards } from "@/lib/services/ai.service";
+import { getFlashcardsFromUrl } from "@/lib/services/quizlet.service"; // Założenie, że ta usługa istnieje
 import { BaseError } from "@/lib/errors";
-import { QuizDBSchema } from "@/types"; // Przykładowy schemat Zod dla quizu
+import { quizService } from "@/lib/services/quiz.service"; // Założenie, że ta usługa istnieje do zapisu w DB
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
+  const userId = locals.session?.user.id;
+  if (!userId) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   // 1. Walidacja wejścia
   const body = await request.json();
-  const inputSchema = z.object({ topic: z.string().min(3) });
+  const inputSchema = z.object({ quizletUrl: z.string().url() });
   const parseResult = inputSchema.safeParse(body);
 
   if (!parseResult.success) {
     return new Response(JSON.stringify(parseResult.error), { status: 400 });
   }
+  const { quizletUrl } = parseResult.data;
 
-  const { topic } = parseResult.data;
-
-  // 2. Definicja promptu
-  const systemPrompt = "Jesteś asystentem, który tworzy quizy na podany temat. Quiz powinien zawierać 5 pytań z 4 odpowiedziami.";
-  const userPrompt = `Temat quizu: ${topic}`;
-
-  // 3. Wywołanie usługi Gemini
   try {
-    const quizData = await geminiService.generateStructuredData(
-      systemPrompt,
-      userPrompt,
-      QuizDBSchema // Użyj schematu Zod, który definiuje strukturę quizu
-    );
-    return new Response(JSON.stringify(quizData), { status: 200 });
+    // 2. Pobranie fiszek z Quizlet
+    const { flashcards, title: originalTitle } = await getFlashcardsFromUrl(quizletUrl);
+    if (!flashcards || flashcards.length === 0) {
+      return new Response("Could not find any flashcards in the provided set.", { status: 404 });
+    }
+
+    // 3. Wywołanie usługi Gemini w trybie wsadowym
+    const generatedQuiz = await generateQuizFromFlashcards(flashcards, originalTitle);
+
+    // 4. Zapisanie quizu do bazy danych
+    const createdQuiz = await quizService.createQuizFromGeneratedData(generatedQuiz, userId);
+
+    return new Response(JSON.stringify(createdQuiz), { status: 201 });
 
   } catch (error) {
     if (error instanceof BaseError) {
-      // Logowanie szczegółów błędu na serwerze
       console.error(`GeminiService Error: ${error.name}`, error.message);
       return new Response(JSON.stringify({ message: error.message }), { status: 500 });
     }
-    // Nieznany błąd
     console.error("Unknown error during quiz generation:", error);
     return new Response("An unexpected error occurred.", { status: 500 });
   }
