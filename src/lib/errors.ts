@@ -192,6 +192,60 @@ export class ContentBlockedError extends AppError {
 }
 
 /**
+ * Quizlet Not Found error when a Quizlet set doesn't exist
+ */
+export class QuizletNotFoundError extends AppError {
+  constructor(setId: string, correlationId?: string) {
+    super("QUIZLET_NOT_FOUND", "Quizlet set not found", 404, { setId }, correlationId);
+  }
+}
+
+/**
+ * Quizlet Private error when a Quizlet set is private and cannot be accessed
+ */
+export class QuizletPrivateError extends AppError {
+  constructor(setId: string, correlationId?: string) {
+    super("QUIZLET_PRIVATE", "This Quizlet set is private", 403, { setId }, correlationId);
+  }
+}
+
+/**
+ * Quizlet Empty error when a Quizlet set contains no flashcards
+ */
+export class QuizletEmptyError extends AppError {
+  constructor(setId: string, correlationId?: string) {
+    super("QUIZLET_EMPTY", "Quizlet set contains no flashcards", 400, { setId }, correlationId);
+  }
+}
+
+/**
+ * Invalid Quizlet URL error when the provided URL format is invalid
+ */
+export class InvalidQuizletUrlError extends AppError {
+  constructor(url: string, correlationId?: string) {
+    super("VALIDATION_ERROR", "Invalid Quizlet URL format", 400, { url }, correlationId);
+  }
+}
+
+/**
+ * Quizlet API error for failures when communicating with Quizlet API
+ */
+export class QuizletApiError extends AppError {
+  constructor(message: string, statusCode: number, details?: Record<string, unknown>, correlationId?: string) {
+    super("INTERNAL_ERROR", `Quizlet API error: ${message}`, statusCode, details, correlationId);
+  }
+}
+
+/**
+ * Data Validation error when API response doesn't match expected schema
+ */
+export class DataValidationError extends AppError {
+  constructor(message: string, details?: Record<string, unknown>, correlationId?: string) {
+    super("INTERNAL_ERROR", `Data validation failed: ${message}`, 500, details, correlationId);
+  }
+}
+
+/**
  * PostgreSQL/Supabase error interface
  */
 interface DatabaseErrorLike {

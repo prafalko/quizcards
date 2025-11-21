@@ -13,6 +13,13 @@ Backend - Supabase jako kompleksowe rozwiązanie backendowe:
 - Jest rozwiązaniem open source, które można hostować lokalnie lub na własnym serwerze
 - Posiada wbudowaną autentykację użytkowników
 
+Quizlet WebAPI - pobieranie fiszek z publicznego setu Quizlet za pomocą webAPI:
+
+- Użycie webapi umożliwia pobranie setu fiszek Quizlet z publicznego linku.
+- Pozwala uzyskać dostęp do danych bez logowania.
+- Możliwe jest pobieranie fiszek niezależnie od języka. Kod jest odporny na zmiany w wyglądzie strony.
+- Użycie restów dostarczonych przez Quizlet zapewnia kompletne pobieranie terminów, definicji i metadanych bez ryzyka zablokowania przez mechanizmy antybotowe Quizlet.
+
 AI - Komunikacja z Gemini przez Google Studio AI:
 
 - Dostęp do Gemini zapewniającego wysoką efektywność i niskie koszta
