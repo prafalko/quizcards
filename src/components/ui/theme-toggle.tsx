@@ -78,7 +78,7 @@ export function ThemeToggle() {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex items-center gap-2 rounded-lg border bg-background/80 p-2 shadow-sm backdrop-blur-sm">
+    <div className="flex items-center gap-2 rounded-lg border bg-background/80 p-2 shadow-sm backdrop-blur-sm">
       <SunIcon className="h-5 w-5 text-foreground" />
       <Switch checked={theme === "dark"} onCheckedChange={toggleTheme} aria-label="Toggle theme" />
       <MoonIcon className="h-5 w-5 text-foreground" />
