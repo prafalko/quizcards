@@ -1,0 +1,50 @@
+---
+import "../styles/global.css";
+import { ThemeToggle } from "@/components/ui/theme-toggle.tsx";
+
+interface Props {
+  title: string;
+  description?: string;
+  metaTitle?: string;
+}
+
+const { title, description, metaTitle = `${title} | QuizCards` } = Astro.props as Props;
+---
+
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{metaTitle}</title>
+    <script is:inline src="/theme-init.js"></script>
+  </head>
+  <body class="bg-background text-foreground">
+    <div class="fixed right-4 top-4 z-10">
+      <ThemeToggle client:load />
+    </div>
+    <main
+      class="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 py-12 lg:flex-row lg:items-center lg:gap-16"
+    >
+      <section class="flex-1 space-y-4 text-center lg:text-left">
+        <a
+          href="/"
+          class="inline-flex items-center justify-center text-sm font-medium text-muted-foreground transition hover:text-foreground lg:justify-start"
+        >
+          <span aria-hidden="true" class="mr-2 text-lg">←</span>
+          Wróć do strony głównej
+        </a>
+        <p class="text-sm font-semibold uppercase tracking-[0.45em] text-primary/80">QuizCards</p>
+        <h1 class="text-4xl font-semibold text-foreground sm:text-5xl">{title}</h1>
+        {description && <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>}
+      </section>
+      <section class="flex w-full flex-1 justify-center">
+        <div class="w-full max-w-md">
+          <slot />
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

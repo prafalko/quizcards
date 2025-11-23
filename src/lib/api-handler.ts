@@ -1,6 +1,5 @@
 import type { APIContext, APIRoute } from "astro";
 import { AppError, extractErrorDetails, UnauthorizedError } from "./errors";
-import { supabaseClient, supabaseDefaultUserId } from "../db/supabase.client";
 import { createQuizService, QuizService } from "./services/quiz.service";
 import { logger, LoggerService } from "./services/logger.service";
 import type { ErrorResponse } from "../types";
@@ -54,18 +53,15 @@ export function createApiRoute<T>(handler: ApiRouteHandler<T>): APIRoute {
       });
 
       // --- Context Injection ---
-      // For MVP, we use a default user ID. In a real application, this would come from the session.
-      const userId = supabaseDefaultUserId;
+      const userId = apiContext.locals.user?.id;
       if (!userId) {
         // This error will be caught by the generic error handler below
-        throw new UnauthorizedError(
-          "User authentication required - SUPABASE_DEFAULT_USER_ID not configured",
-          correlationId
-        );
+        throw new UnauthorizedError("User authentication required - no active session", correlationId);
       }
 
-      // Create an instance of the quiz service, passing in the Supabase client
-      const quizService = createQuizService(supabaseClient);
+      // Create an instance of the quiz service using the request-specific Supabase client
+      // This ensures each request uses its own session context
+      const quizService = createQuizService(apiContext.locals.supabase);
 
       // --- Handler Execution ---
       // Execute the specific route handler logic

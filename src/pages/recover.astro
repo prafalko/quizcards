@@ -1,0 +1,11 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { RecoverAccountForm } from "@/components/auth/RecoverAccountForm";
+
+const title = "Odzyskiwanie konta";
+const description = "Wyślij link resetujący hasło na swój adres e-mail.";
+---
+
+<AuthLayout title={title} description={description}>
+  <RecoverAccountForm client:load />
+</AuthLayout>

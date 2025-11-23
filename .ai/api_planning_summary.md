@@ -3,7 +3,7 @@
 
 1.  **Zakres MVP**: Aplikacja na etapie MVP będzie skierowana wyłącznie do użytkowników Quizlet. Import fiszek z innych źródeł jest poza zakresem.
 2.  **Generowanie Quizu**: Quiz jest generowany na podstawie publicznego linku do zestawu fiszek z Quizlet. Domyślna liczba pytań w quizie jest równa liczbie fiszek w zestawie.
-3.  **Konta Użytkowników**: Wprowadzony zostanie prosty system kont oparty na loginie (e-mail) i haśle, bez integracji z zewnętrznymi dostawcami.
+3.  **Konta Użytkowników**: Wprowadzony zostanie prosty system kont oparty na adresie e-mail i haśle, bez integracji z zewnętrznymi dostawcami.
 4.  **Klucz API**: Aplikacja będzie korzystać z jednego, centralnego klucza API administratora. Użytkownicy nie będą musieli podawać własnych kluczy.
 5.  **Edycja Quizu**: Użytkownik może edytować tytuł quizu oraz treść pytań i odpowiedzi za pomocą edytora plain text. W trybie edycji pierwsza odpowiedź jest zawsze poprawna i odpowiednio oznaczona. Dostępna będzie opcja ponownego wygenerowania odpowiedzi.
 6.  **Interfejs Rozwiązywania Quizu**: Pytania będą wyświetlane pojedynczo, jedno po drugim. Kolejność pytań jak i odpowiedzi w danym pytaniu będzie losowa.
@@ -30,7 +30,7 @@
 
 #### 1. Główne Wymagania Funkcjonalne
 
-- **System Użytkowników**: Rejestracja i logowanie za pomocą loginu/hasła. Przechowywanie quizów przypisanych do konta.
+- **System Użytkowników**: Rejestracja i logowanie za pomocą adresu e-mail/hasła. Przechowywanie quizów przypisanych do konta.
 - **Import i Generowanie**: Funkcja importu zestawu fiszek za pomocą publicznego linku z Quizlet.com. Generowanie przez AI quizu ABCD, gdzie jedna odpowiedź jest poprawna (z fiszki), a trzy fałszywe są dopasowane kontekstowo.
 - **Zarządzanie Quizami**: Tworzenie, przeglądanie (w formie listy), edycja (tytuł, pytania, odpowiedzi) oraz usuwanie quizów i poszczególnych pytań.
 - **Rozwiązywanie Quizu**: Interfejs do rozwiązywania quizu (jedno pytanie na raz, losowa kolejność pytań i odpowiedzi do pytań).

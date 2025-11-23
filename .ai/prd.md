@@ -10,7 +10,7 @@ Standardowa funkcja generowania quizów w Quizlet tworzy nieprawidłowe odpowied
 
 ## 3. Wymagania funkcjonalne
 
-- F-01: System kont użytkowników: Użytkownicy muszą mieć możliwość rejestracji i logowania za pomocą adresu login i hasła.
+- F-01: System kont użytkowników: Użytkownicy muszą mieć możliwość rejestracji i logowania za pomocą adresu e-mail i hasła.
 - F-02: Przechowywanie danych: Quizy utworzone przez użytkownika muszą być powiązane z jego kontem i bezpiecznie przechowywane.
 - F-03: Import z Quizlet: Aplikacja musi umożliwiać import fiszek z publicznego zestawu Quizlet na podstawie podanego adresu URL.
 - F-04: Generowanie quizu przez AI: Na podstawie zaimportowanych fiszek, system ma generować pytania quizowe. Każde pytanie powinno składać się z treści pytania (z jednej strony fiszki), poprawnej odpowiedzi (z drugiej strony fiszki) oraz trzech nieprawidłowych, ale kontekstowo pasujących odpowiedzi wygenerowanych przez AI.
@@ -39,23 +39,23 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
 
 - ID: US-001
 - Tytuł: Rejestracja nowego użytkownika
-- Opis: Jako nowy użytkownik, chcę móc założyć konto w aplikacji, podając swój login i hasło, abym mógł przechowywać i zarządzać swoimi quizami.
+- Opis: Jako nowy użytkownik, chcę móc założyć konto w aplikacji, podając swój adres e-mail i hasło, abym mógł przechowywać i zarządzać swoimi quizami.
 - Kryteria akceptacji:
-  - Formularz rejestracji zawiera pola na login i hasło.
+  - Formularz rejestracji zawiera pola na adres e-mail i hasło.
   - Po pomyślnej rejestracji, użytkownik jest automatycznie zalogowany i przekierowany do panelu głównego.
-  - W przypadku, gdy użytkownik o podanym loginie już istnieje, wyświetlany jest odpowiedni komunikat błędu.
+  - W przypadku, gdy użytkownik o podanym adresie e-mail już istnieje, wyświetlany jest odpowiedni komunikat błędu.
   - Jeśli żaden użytkownik nie jest obecnie zalogowany to każdy widok powinien przekierowywać do widoku rejestracji/logowania.
   - Żadna fukcjonalność inna niż logowanie/rejestracja nie powinna być dostępna dla niezalogowanych użytkowników, w szczególności funkcjonalności opisane w historyjkach od US-004 do US-013
 
 - ID: US-002
 - Tytuł: Logowanie do aplikacji
-- Opis: Jako zarejestrowany użytkownik, chcę móc zalogować się na swoje konto za pomocą loginu i hasła, aby uzyskać dostęp do moich quizów.
+- Opis: Jako zarejestrowany użytkownik, chcę móc zalogować się na swoje konto za pomocą adresu e-mail i hasła, aby uzyskać dostęp do moich quizów.
 - Kryteria akceptacji:
-  - Formularz logowania zawiera pola na login i hasło.
+  - Formularz logowania zawiera pola na adres e-mail i hasło.
   - Po pomyślnym zalogowaniu, użytkownik jest przekierowany do panelu głównego (listy quizów).
   - W przypadku podania nieprawidłowych danych, wyświetlany jest odpowiedni komunikat błędu.
   - Jeśli żaden użytkownik nie jest obecnie zalogowany to każdy widok powinien przekierowywać do widoku rejestracji/logowania.
-  - Żadna fukcjonalność inna niż logowanie/rejestracja nie powinna być dostępna dla niezalogowanych użytkowników, w szczególności funkcjonalności opisane w historyjkach od US-004 do US-013
+  - Żadna fukcjonalność aplikacji inna niż logowanie/rejestracja nie powinna być dostępna dla niezalogowanych użytkowników, w szczególności funkcjonalności opisane w historyjkach od US-004 do US-013
 
 - ID: US-003
 - Tytuł: Wylogowanie z aplikacji
@@ -63,7 +63,6 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
 - Kryteria akceptacji:
   - W interfejsie użytkownika znajduje się przycisk "Wyloguj".
   - Po kliknięciu przycisku, sesja użytkownika jest kończona i jest on przekierowywany na stronę logowania.
-  - Odzyskiwanie hasła powinno być możliwe.
 
 ### Generowanie i Zarządzanie Quizami
 

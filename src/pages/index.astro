@@ -7,12 +7,26 @@ import { logger } from "../lib/services/logger.service";
 // Konfiguracja dla hybrid rendering - ta strona będzie server-side rendered
 export const prerender = false;
 
+const user = Astro.locals.user;
+
+if (!user) {
+  return Astro.redirect("/login");
+}
+
 // Pobranie listy quizów po stronie serwera
 let quizzes: QuizzesListDTO = [];
 let error: string | null = null;
 
 try {
-  const response = await fetch(`${Astro.url.origin}/api/quizzes`);
+  /**
+   * Forward cookies manually so the API sees the active user session
+   * and does not redirect to /login (which would break JSON parsing).
+   */
+  const response = await fetch(new URL("/api/quizzes", Astro.url), {
+    headers: {
+      cookie: Astro.request.headers.get("cookie") ?? "",
+    },
+  });
 
   if (response.ok) {
     quizzes = await response.json();
