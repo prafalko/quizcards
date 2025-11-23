@@ -7,12 +7,6 @@ import { logger } from "../lib/services/logger.service";
 // Konfiguracja dla hybrid rendering - ta strona będzie server-side rendered
 export const prerender = false;
 
-const user = Astro.locals.user;
-
-if (!user) {
-  return Astro.redirect("/login");
-}
-
 // Pobranie listy quizów po stronie serwera
 let quizzes: QuizzesListDTO = [];
 let error: string | null = null;

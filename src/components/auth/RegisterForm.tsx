@@ -43,9 +43,43 @@ export function RegisterForm() {
     setStatus("idle");
     setMessage(undefined);
 
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setStatus("success");
-    setMessage(`Świetnie ${values.email}! W kolejnym zadaniu podłączymy rzeczywistą rejestrację.`);
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+        credentials: "include",
+      });
+
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        setStatus("error");
+        setMessage(payload?.error ?? "Nie udało się utworzyć konta. Spróbuj ponownie.");
+        return;
+      }
+
+      if (payload?.requiresConfirmation) {
+        setStatus("success");
+        setMessage(
+          payload.message ??
+            "Konto zostało utworzone. Sprawdź swoją skrzynkę e-mail i kliknij link weryfikacyjny, aby aktywować konto."
+        );
+      } else {
+        // Email confirmation disabled - user is automatically logged in
+        setStatus("success");
+        setMessage("Konto zostało utworzone. Przekierowuję...");
+        setTimeout(() => {
+          window.location.assign("/");
+        }, 800);
+      }
+    } catch {
+      setStatus("error");
+      setMessage("Ups! Nie udało się połączyć z serwerem. Spróbuj ponownie.");
+    }
   };
 
   return (
@@ -65,7 +99,7 @@ export function RegisterForm() {
               type="email"
               inputMode="email"
               autoComplete="email"
-              placeholder="ty@quizcards.app"
+              placeholder="emily@example.com"
               aria-invalid={Boolean(errors.email)}
               aria-describedby={errors.email ? "register-email-error" : undefined}
               {...register("email")}
