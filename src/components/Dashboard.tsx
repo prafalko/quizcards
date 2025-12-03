@@ -13,6 +13,8 @@ export function Dashboard({ initialQuizzes }: DashboardProps) {
     quizzes,
     generationState,
     generationError,
+    errorCode,
+    errorDetails,
     quizToDelete,
     handleGenerateQuiz,
     handleDeleteRequest,
@@ -43,6 +45,8 @@ export function Dashboard({ initialQuizzes }: DashboardProps) {
             isGenerating={generationState === "loading"}
             onSubmit={handleGenerateQuiz}
             error={generationError}
+            errorCode={errorCode}
+            errorDetails={errorDetails}
           />
         </section>
 

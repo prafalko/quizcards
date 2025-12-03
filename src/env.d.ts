@@ -1,6 +1,7 @@
 /// <reference types="astro/client" />
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+
 import type { Database } from "./db/database.types.ts";
 
 declare global {
@@ -16,6 +17,7 @@ interface ImportMetaEnv {
   readonly SUPABASE_KEY: string;
   readonly SUPABASE_DEFAULT_USER_ID: string;
   readonly GEMINI_API_KEY: string;
+  readonly QUIZLET_COOKIE: string;
 }
 
 interface ImportMeta {
