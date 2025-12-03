@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Copy, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -27,9 +27,24 @@ export function QuizGenerationForm({
   const [jsonParseError, setJsonParseError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
 
-  // Check if error is scraper failed error
-  const isScraperFailed = errorCode === "QUIZLET_SCRAPER_FAILED";
-  const apiUrl = errorDetails?.apiUrl as string | undefined;
+  // Zachowaj stan błędu scrapera nawet podczas generowania
+  const [savedScraperFailed, setSavedScraperFailed] = useState(false);
+  const [savedApiUrl, setSavedApiUrl] = useState<string | undefined>(undefined);
+
+  // Aktualizuj zapisane wartości gdy pojawi się błąd scrapera
+  useEffect(() => {
+    if (errorCode === "QUIZLET_SCRAPER_FAILED") {
+      setSavedScraperFailed(true);
+      const apiUrlValue = errorDetails?.apiUrl as string | undefined;
+      if (apiUrlValue) {
+        setSavedApiUrl(apiUrlValue);
+      }
+    }
+  }, [errorCode, errorDetails]);
+
+  // Check if error is scraper failed error (używaj zapisanych wartości jeśli są dostępne)
+  const isScraperFailed = savedScraperFailed || errorCode === "QUIZLET_SCRAPER_FAILED";
+  const apiUrl = savedApiUrl || (errorDetails?.apiUrl as string | undefined);
 
   const handleCopyUrl = async () => {
     if (apiUrl) {
