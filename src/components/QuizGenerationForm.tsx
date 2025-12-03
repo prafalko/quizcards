@@ -147,19 +147,33 @@ export function QuizGenerationForm({
             <label htmlFor="api-url" className="text-sm font-medium">
               Krok 1: Otwórz ten link w przeglądarce
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-stretch">
               <Input
                 id="api-url"
                 type="text"
                 value={apiUrl}
                 readOnly
-                className="font-mono text-xs"
+                className="font-mono text-xs h-9"
                 onClick={(e) => e.currentTarget.select()}
               />
-              <Button type="button" variant="outline" size="sm" onClick={handleCopyUrl} title="Skopiuj link">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-9"
+                onClick={handleCopyUrl}
+                title="Skopiuj link"
+              >
                 {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </Button>
-              <Button type="button" variant="outline" size="sm" onClick={handleOpenUrl} title="Otwórz w nowej karcie">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-9"
+                onClick={handleOpenUrl}
+                title="Otwórz w nowej karcie"
+              >
                 Otwórz
               </Button>
             </div>
