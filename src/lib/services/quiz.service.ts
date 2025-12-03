@@ -16,7 +16,7 @@ import type {
 } from "../../types";
 import { logger } from "./logger.service";
 import { DatabaseError, NotFoundError, ForbiddenError, AIGenerationError } from "../../lib/errors";
-import { generateIncorrectAnswers } from "./ai.service";
+import { generateIncorrectAnswers, generateQuizFromFlashcards } from "./ai.service";
 import { fetchQuizletSet } from "./quizlet.service";
 
 /**
@@ -57,32 +57,42 @@ export class QuizService {
       // Step 1: Fetch flashcards from Quizlet
       const quizletSet = await fetchQuizletSet(quizletSetId);
 
-      // Step 2: Generate incorrect answers using AI for all flashcards
-      const questionsWithAnswers = await Promise.all(
-        quizletSet.flashcards.map(async (flashcard) => {
-          const aiResponse = await generateIncorrectAnswers({
-            question: flashcard.term,
-            correctAnswer: flashcard.definition,
-          });
+      // Step 2: Generate complete quiz with all incorrect answers using AI in a single batch request
+      const aiResponse = await generateQuizFromFlashcards({
+        flashcards: quizletSet.flashcards,
+        topic: quizletSet.title,
+        temperature: 0.7,
+      });
 
-          return {
-            question_text: flashcard.term,
-            answers: [
-              { answer_text: flashcard.definition, is_correct: true, source: "provided" as const },
-              ...aiResponse.incorrectAnswers.map((answer) => ({
-                answer_text: answer,
-                is_correct: false,
-                source: "ai" as const,
-              })),
-            ],
-            metadata: aiResponse.metadata,
-          };
-        })
-      );
+      // Transform the AI-generated quiz data to the format expected by the database RPC
+      const questionsWithAnswers = aiResponse.quiz.questions.map((generatedQuestion) => {
+        // Create metadata for each question based on the batch generation metadata
+        const questionMetadata: QuestionMetadata = {
+          model: aiResponse.metadata.model,
+          temperature: aiResponse.metadata.temperature,
+          seed: aiResponse.metadata.seed,
+          prompt: `Quiz generated from Quizlet set: ${quizletSet.title}`,
+          regenerated_at: aiResponse.metadata.generatedAt,
+        };
+
+        return {
+          question_text: generatedQuestion.question,
+          answers: [
+            { answer_text: generatedQuestion.correctAnswer, is_correct: true, source: "provided" as const },
+            ...generatedQuestion.incorrectAnswers.map((answer) => ({
+              answer_text: answer,
+              is_correct: false,
+              source: "ai" as const,
+            })),
+          ],
+          metadata: questionMetadata,
+        };
+      });
 
       // Step 3: Save quiz, questions, and answers in a transaction
+      // Use AI-generated title if no title provided in command, fallback to Quizlet set title
       const { data, error } = await this.supabase.rpc("create_quiz_with_questions_and_answers", {
-        quiz_title: command.title || quizletSet.title,
+        quiz_title: command.title || aiResponse.quiz.title || quizletSet.title,
         quiz_status: "draft",
         quiz_source_url: command.source_url,
         quiz_quizlet_set_id: quizletSetId,
