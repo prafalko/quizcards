@@ -3,7 +3,7 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 const title = "Zaloguj się";
-const description = "Uzyskaj dostęp do swoich quizów i statystyk.";
+const description = "Twórz ciekawe quizy i sprawdzaj swoją wiedzę!";
 const statusParam = Astro.url.searchParams.get("status");
 const initialStatus = statusParam === "success" || statusParam === "error" ? statusParam : "idle";
 const initialMessage = Astro.url.searchParams.get("message") ?? undefined;

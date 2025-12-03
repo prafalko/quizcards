@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { updateLastActivity } from "@/lib/activity-tracker";
 
 import { AuthFormMessage, type AuthFormStatus } from "./AuthFormMessage";
 
@@ -55,6 +56,10 @@ export function LoginForm({ initialStatus = "idle", initialMessage }: LoginFormP
 
       setStatus("success");
       setMessage("Zalogowano pomyślnie. Przekierowuję...");
+
+      // Initialize activity tracking after successful login
+      updateLastActivity();
+
       setTimeout(() => {
         window.location.assign("/");
       }, 800);

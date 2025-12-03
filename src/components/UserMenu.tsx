@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { logger } from "../lib/services/logger.service";
+import { clearActivity } from "../lib/activity-tracker";
 
 interface UserMenuProps {
   userEmail: string | null;
@@ -24,6 +25,9 @@ export function UserMenu({ userEmail }: UserMenuProps) {
         throw new Error("Nie udało się wylogować");
       }
 
+      // Clear activity tracking on logout
+      clearActivity();
+
       // Przekieruj do strony logowania po pomyślnym wylogowaniu
       window.location.assign("/login");
     } catch (error) {
@@ -35,6 +39,8 @@ export function UserMenu({ userEmail }: UserMenuProps) {
         operation: "user.logout",
       });
       setIsLoggingOut(false);
+      // Clear activity tracking even on error
+      clearActivity();
       // Nawet jeśli wystąpi błąd, spróbuj przekierować użytkownika
       window.location.assign("/login");
     }

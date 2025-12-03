@@ -29,13 +29,6 @@ const { title, description, metaTitle = `${title} | QuizCards` } = Astro.props a
       class="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 py-12 lg:flex-row lg:items-center lg:gap-16"
     >
       <section class="flex-1 space-y-4 text-center lg:text-left">
-        <a
-          href="/"
-          class="inline-flex items-center justify-center text-sm font-medium text-muted-foreground transition hover:text-foreground lg:justify-start"
-        >
-          <span aria-hidden="true" class="mr-2 text-lg">←</span>
-          Wróć do strony głównej
-        </a>
         <p class="text-sm font-semibold uppercase tracking-[0.45em] text-primary/80">QuizCards</p>
         <h1 class="text-4xl font-semibold text-foreground sm:text-5xl">{title}</h1>
         {description && <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>}

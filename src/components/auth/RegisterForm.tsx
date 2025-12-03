@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { updateLastActivity } from "@/lib/activity-tracker";
 
 import { AuthFormMessage, type AuthFormStatus } from "./AuthFormMessage";
 
@@ -72,6 +73,10 @@ export function RegisterForm() {
         // Email confirmation disabled - user is automatically logged in
         setStatus("success");
         setMessage("Konto zostało utworzone. Przekierowuję...");
+
+        // Initialize activity tracking after successful registration/login
+        updateLastActivity();
+
         setTimeout(() => {
           window.location.assign("/");
         }, 800);
