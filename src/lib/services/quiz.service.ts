@@ -13,6 +13,7 @@ import type {
   RegenerateAnswersCommand,
   QuestionMetadata,
   CreateQuizCommand,
+  QuizletSet,
 } from "../../types";
 import { logger } from "./logger.service";
 import { DatabaseError, NotFoundError, ForbiddenError, AIGenerationError } from "../../lib/errors";
@@ -54,8 +55,16 @@ export class QuizService {
     logger.logRequestStart("createQuizFromQuizlet", correlationId || "unknown", userId, { quizletSetId });
 
     try {
-      // Step 1: Fetch flashcards from Quizlet
-      const quizletSet = await fetchQuizletSet(quizletSetId);
+      // Step 1: Fetch flashcards from Quizlet (or parse JSON if provided)
+      let quizletSet: QuizletSet;
+      if (command.quizlet_json) {
+        // Use provided JSON directly (fallback mode)
+        const { parseQuizletJson } = await import("./quizlet.service");
+        quizletSet = parseQuizletJson(command.quizlet_json, command.source_url);
+      } else {
+        // Normal scraping mode
+        quizletSet = await fetchQuizletSet(quizletSetId);
+      }
 
       // Step 2: Generate complete quiz with all incorrect answers using AI in a single batch request
       const aiResponse = await generateQuizFromFlashcards({

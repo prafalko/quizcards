@@ -8,6 +8,7 @@ import {
   QuizletNotFoundError,
   QuizletPrivateError,
   QuizletEmptyError,
+  QuizletScraperFailedError,
 } from "../errors";
 /**
  * Quizlet Service - handles fetching flashcards from Quizlet
@@ -158,7 +159,7 @@ async function _fetchQuizletData(setId: string): Promise<QuizletApiResponse> {
     const quizletPageUrl = `https://quizlet.com/${setId}`;
     const navigationResponse = await page.goto(quizletPageUrl, {
       waitUntil: "networkidle",
-      timeout: 30000,
+      timeout: 10000,
     });
 
     // Check if page loaded successfully
@@ -192,7 +193,7 @@ async function _fetchQuizletData(setId: string): Promise<QuizletApiResponse> {
     // If API call wasn't intercepted, try direct API call through the browser
     const response = await page.goto(apiUrl, {
       waitUntil: "networkidle",
-      timeout: 30000,
+      timeout: 10000,
     });
 
     if (!response) {
@@ -238,12 +239,41 @@ async function _fetchQuizletData(setId: string): Promise<QuizletApiResponse> {
       throw error;
     }
 
-    // Handle Playwright/network errors
-    throw new QuizletApiError("Browser automation failed", 502, {
-      originalError: error instanceof Error ? error.message : String(error),
-      url: apiUrl,
-    });
+    // Handle Playwright/network errors - throw scraper failed error with API URL for fallback
+    throw new QuizletScraperFailedError(apiUrl, error instanceof Error ? error.message : String(error));
   }
+}
+
+/**
+ * Gets the API URL for a Quizlet set ID
+ * Used for fallback when scraper fails
+ * @param setId - Quizlet set ID
+ * @returns API URL
+ */
+export function getQuizletApiUrl(setId: string): string {
+  const baseUrl = "https://quizlet.com/webapi/3.9/studiable-item-documents";
+  const params = new URLSearchParams({
+    "filters[studiableContainerId]": setId,
+    "filters[studiableContainerType]": "1",
+    perPage: "1000",
+    page: "1",
+  });
+  return `${baseUrl}?${params.toString()}`;
+}
+
+/**
+ * Parses Quizlet JSON response directly without scraping
+ * Used as fallback when scraper fails
+ * @param jsonData - Raw JSON response from Quizlet API
+ * @param url - Original Quizlet URL (for title extraction)
+ * @returns QuizletSet with flashcards
+ * @throws DataValidationError if JSON structure is invalid
+ * @throws QuizletEmptyError if set contains no flashcards
+ */
+export function parseQuizletJson(jsonData: unknown, url: string): QuizletSet {
+  const setId = extractQuizletSetId(url);
+  const title = _extractTitleFromUrl(url);
+  return _transformApiResponse(jsonData, title, setId);
 }
 /**
  * Transforms raw Quizlet API response into QuizletSet format

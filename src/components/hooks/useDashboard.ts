@@ -6,8 +6,10 @@ interface UseDashboardReturn {
   quizzes: QuizzesListDTO;
   generationState: GenerationState;
   generationError: string | null;
+  errorCode: string | null;
+  errorDetails: ErrorResponse["error"]["details"] | undefined;
   quizToDelete: QuizListItemDTO | null;
-  handleGenerateQuiz: (url: string) => Promise<void>;
+  handleGenerateQuiz: (url: string, jsonData?: unknown) => Promise<void>;
   handleDeleteRequest: (quizId: string) => void;
   handleConfirmDelete: () => Promise<void>;
   handleCancelDelete: () => void;
@@ -16,17 +18,26 @@ export function useDashboard(initialQuizzes: QuizzesListDTO): UseDashboardReturn
   const [quizzes, setQuizzes] = useState<QuizzesListDTO>(initialQuizzes);
   const [generationState, setGenerationState] = useState<GenerationState>("idle");
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<ErrorResponse["error"]["details"] | undefined>(undefined);
   const [quizToDelete, setQuizToDelete] = useState<QuizListItemDTO | null>(null);
-  const handleGenerateQuiz = useCallback(async (url: string) => {
+  const handleGenerateQuiz = useCallback(async (url: string, jsonData?: unknown) => {
     setGenerationState("loading");
     setGenerationError(null);
+    setErrorCode(null);
+    setErrorDetails(undefined);
     try {
+      const requestBody: { source_url: string; quizlet_json?: unknown } = { source_url: url };
+      if (jsonData) {
+        requestBody.quizlet_json = jsonData;
+      }
+
       const response = await fetch("/api/quizzes/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ source_url: url }),
+        body: JSON.stringify(requestBody),
       });
       if (!response.ok) {
         const errorData: ErrorResponse = await response.json();
@@ -36,11 +47,14 @@ export function useDashboard(initialQuizzes: QuizzesListDTO): UseDashboardReturn
           QUIZLET_PRIVATE: "Ten zestaw jest prywatny. Użyj publicznego zestawu.",
           QUIZLET_NOT_FOUND: "Nie znaleziono zestawu Quizlet",
           QUIZLET_EMPTY: "Ten zestaw nie zawiera fiszek",
+          QUIZLET_SCRAPER_FAILED: "Automatyczne pobieranie nie powiodło się",
           AI_GENERATION_FAILED: "Nie udało się wygenerować pytań. Spróbuj ponownie.",
           RATE_LIMIT_EXCEEDED: "Za dużo żądań. Spróbuj ponownie za chwilę.",
         };
         const errorMessage = errorMessages[errorData.error.code] || "Wystąpił nieoczekiwany błąd";
         setGenerationError(errorMessage);
+        setErrorCode(errorData.error.code);
+        setErrorDetails(errorData.error.details);
         setGenerationState("error");
         return;
       }
@@ -111,6 +125,8 @@ export function useDashboard(initialQuizzes: QuizzesListDTO): UseDashboardReturn
     quizzes,
     generationState,
     generationError,
+    errorCode,
+    errorDetails,
     quizToDelete,
     handleGenerateQuiz,
     handleDeleteRequest,

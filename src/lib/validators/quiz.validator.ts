@@ -48,6 +48,7 @@ export const validateGenerateQuizCommand = z.object({
       { message: "Invalid Quizlet set URL format. URL must contain a valid set ID." }
     ),
   title: z.string().min(1, "Title cannot be empty").max(200, "Title is too long").optional(),
+  quizlet_json: z.unknown().optional(), // Optional JSON data for fallback when scraper fails
 });
 
 /**

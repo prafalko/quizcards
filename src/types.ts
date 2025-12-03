@@ -80,6 +80,7 @@ export type QuizzesListDTO = QuizListItemDTO[];
 export interface CreateQuizCommand {
   source_url: string;
   title?: string; // Optional, defaults to Quizlet set title
+  quizlet_json?: unknown; // Optional JSON data for fallback when scraper fails
 }
 
 /**
@@ -140,6 +141,7 @@ export type ErrorCode =
   | "QUIZLET_PRIVATE"
   | "QUIZLET_NOT_FOUND"
   | "QUIZLET_EMPTY"
+  | "QUIZLET_SCRAPER_FAILED"
   | "AI_GENERATION_FAILED"
   | "DATABASE_ERROR"
   | "INTERNAL_ERROR"

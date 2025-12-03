@@ -237,6 +237,25 @@ export class QuizletApiError extends AppError {
 }
 
 /**
+ * Quizlet Scraper Failed error when scraper fails (e.g., captcha required)
+ * Includes the API URL for manual fallback
+ */
+export class QuizletScraperFailedError extends AppError {
+  constructor(apiUrl: string, originalError: string, correlationId?: string) {
+    super(
+      "QUIZLET_SCRAPER_FAILED",
+      "Quizlet scraper failed - manual input required",
+      502,
+      {
+        apiUrl,
+        originalError,
+      },
+      correlationId
+    );
+  }
+}
+
+/**
  * Data Validation error when API response doesn't match expected schema
  */
 export class DataValidationError extends AppError {
