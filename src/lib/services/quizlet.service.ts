@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { chromium, type Response } from "playwright";
 import type { QuizletSet } from "../../types";
 import {
   InvalidQuizletUrlError,
@@ -98,7 +99,8 @@ function _extractTitleFromUrl(url: string): string {
   return title || "My quizlet set";
 }
 /**
- * Fetches raw data from Quizlet WebAPI
+ * Fetches raw data from Quizlet WebAPI using Playwright
+ * Uses a real browser to bypass anti-bot protections
  * @param setId - Quizlet set ID
  * @returns Raw API response
  * @throws QuizletApiError for network or API errors
@@ -113,46 +115,120 @@ async function _fetchQuizletData(setId: string): Promise<QuizletApiResponse> {
     perPage: "1000",
     page: "1",
   });
-  const url = `${baseUrl}?${params.toString()}`;
-  // Zdefiniuj nagłówki, które mają naśladować przeglądarkę
-  const requestHeaders = new Headers();
-  requestHeaders.append(
-    "User-Agent",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
-  );
-  // To jest kluczowe, aby pokazać, że akceptujesz odpowiedź JSON
-  requestHeaders.append("Accept", "application/json, text/plain, */*");
-  // Dodaj języki, które preferujesz
-  requestHeaders.append("Accept-Language", "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7");
-  // Możesz rozważyć dodanie również innych nagłówków, jeśli samo User-Agent nie wystarczy
-  // requestHeaders.append("Accept", "application/json");
-  // requestHeaders.append("Accept-Language", "en-US,en;q=0.9");
-  const quizletCookie = import.meta.env.QUIZLET_COOKIE;
-  requestHeaders.append("Cookie", `qlts=${quizletCookie}`);
+  const apiUrl = `${baseUrl}?${params.toString()}`;
+
+  let browser;
   try {
-    // Dodaj obiekt 'headers' do opcji zapytania fetch
-    const response = await fetch(url, {
-      method: "GET",
-      headers: requestHeaders,
+    // Launch browser in windowed mode (headless: false) to avoid anti-bot detection
+    browser = await chromium.launch({
+      headless: false,
+      args: [
+        "--disable-blink-features=AutomationControlled", // Hide automation flags
+      ],
     });
-    // Handle HTTP errors
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new QuizletNotFoundError(setId);
+
+    const context = await browser.newContext({
+      userAgent:
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      viewport: { width: 1280, height: 720 },
+      locale: "en-US",
+    });
+
+    const page = await context.newPage();
+
+    // Set up response interception
+    let apiResponse: QuizletApiResponse | null = null;
+    let responseStatus = 0;
+
+    page.on("response", async (response: Response) => {
+      const url = response.url();
+      // Check if this is the API response we're looking for
+      if (url.includes("studiable-item-documents") && url.includes(setId)) {
+        responseStatus = response.status();
+        try {
+          const data = await response.json();
+          apiResponse = data;
+        } catch {
+          // Ignore JSON parse errors
+        }
       }
-      if (response.status === 403) {
-        // Ten błąd powinien teraz zniknąć dla publicznych zestawów!
-        throw new QuizletPrivateError(setId);
-      }
-      throw new QuizletApiError(`HTTP ${response.status}: ${response.statusText}`, response.status, {
-        url,
-        status: response.status,
-        statusText: response.statusText,
+    });
+
+    // Navigate to the Quizlet set page to trigger API calls
+    const quizletPageUrl = `https://quizlet.com/${setId}`;
+    const navigationResponse = await page.goto(quizletPageUrl, {
+      waitUntil: "networkidle",
+      timeout: 30000,
+    });
+
+    // Check if page loaded successfully
+    if (!navigationResponse) {
+      throw new QuizletApiError("Failed to load Quizlet page", 502, {
+        url: quizletPageUrl,
       });
     }
+
+    // If we caught the API response during page load, return it
+    if (apiResponse) {
+      await browser.close();
+
+      // Handle HTTP errors
+      if (responseStatus === 404) {
+        throw new QuizletNotFoundError(setId);
+      }
+      if (responseStatus === 403) {
+        throw new QuizletPrivateError(setId);
+      }
+      if (responseStatus >= 400) {
+        throw new QuizletApiError(`HTTP ${responseStatus}`, responseStatus, {
+          url: apiUrl,
+          status: responseStatus,
+        });
+      }
+
+      return apiResponse;
+    }
+
+    // If API call wasn't intercepted, try direct API call through the browser
+    const response = await page.goto(apiUrl, {
+      waitUntil: "networkidle",
+      timeout: 30000,
+    });
+
+    if (!response) {
+      await browser.close();
+      throw new QuizletApiError("Failed to fetch API data", 502, {
+        url: apiUrl,
+      });
+    }
+
+    // Handle HTTP errors
+    if (response.status() === 404) {
+      await browser.close();
+      throw new QuizletNotFoundError(setId);
+    }
+    if (response.status() === 403) {
+      await browser.close();
+      throw new QuizletPrivateError(setId);
+    }
+    if (!response.ok()) {
+      await browser.close();
+      throw new QuizletApiError(`HTTP ${response.status()}: ${response.statusText()}`, response.status(), {
+        url: apiUrl,
+        status: response.status(),
+        statusText: response.statusText(),
+      });
+    }
+
     const data = await response.json();
+    await browser.close();
     return data;
   } catch (error) {
+    // Clean up browser
+    if (browser) {
+      await browser.close();
+    }
+
     // Re-throw our custom errors
     if (
       error instanceof QuizletNotFoundError ||
@@ -161,10 +237,11 @@ async function _fetchQuizletData(setId: string): Promise<QuizletApiResponse> {
     ) {
       throw error;
     }
-    // Handle network errors
-    throw new QuizletApiError("Network request failed", 502, {
+
+    // Handle Playwright/network errors
+    throw new QuizletApiError("Browser automation failed", 502, {
       originalError: error instanceof Error ? error.message : String(error),
-      url,
+      url: apiUrl,
     });
   }
 }
