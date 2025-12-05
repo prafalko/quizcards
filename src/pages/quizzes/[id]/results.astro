@@ -17,7 +17,11 @@ try {
   if (!id) {
     error = "Nieprawidłowy identyfikator quizu";
   } else {
-    const response = await fetch(`${Astro.url.origin}/api/quizzes/${id}`);
+    const response = await fetch(new URL(`/api/quizzes/${id}`, Astro.url), {
+      headers: {
+        cookie: Astro.request.headers.get("cookie") ?? "",
+      },
+    });
 
     if (response.ok) {
       quiz = await response.json();

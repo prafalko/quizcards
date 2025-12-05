@@ -12,7 +12,15 @@ let quizzes: QuizzesListDTO = [];
 let error: string | null = null;
 
 try {
-  const response = await fetch(`${Astro.url.origin}/api/quizzes`);
+  /**
+   * Forward cookies manually so the API sees the active user session
+   * and does not redirect to /login (which would break JSON parsing).
+   */
+  const response = await fetch(new URL("/api/quizzes", Astro.url), {
+    headers: {
+      cookie: Astro.request.headers.get("cookie") ?? "",
+    },
+  });
 
   if (response.ok) {
     quizzes = await response.json();

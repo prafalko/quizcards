@@ -64,7 +64,7 @@ Jest to generyczna metoda publiczna, która będzie głównym interfejsem usług
 
 - **Cel:** Inicjalizacja i zwrócenie instancji modelu generatywnego z odpowiednią konfiguracją.
 - **Parametry:**
-    - `generationConfig` (object): Obiekt konfiguracyjny dla modelu (temperatura, `maxOutputTokens`, `responseMimeType` itp.).
+    - `generationConfig` (object): Obiekt konfiguracyjny dla modelu (temperatura, `responseMimeType` itp.).
 - **Zwraca:** Instancję `GenerativeModel`.
 
 #### `private buildPrompt(...)`

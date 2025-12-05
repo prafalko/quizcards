@@ -43,12 +43,10 @@ export class GeminiService {
     generationConfig?: {
       temperature?: number;
       seed?: number;
-      maxOutputTokens?: number;
     }
   ): Promise<z.infer<T>> {
     const config = {
       temperature: generationConfig?.temperature ?? 0.7,
-      maxOutputTokens: generationConfig?.maxOutputTokens ?? 8192,
       responseMimeType: "application/json",
     };
 
@@ -57,7 +55,6 @@ export class GeminiService {
       metadata: {
         modelName: this.modelName,
         temperature: config.temperature,
-        maxOutputTokens: config.maxOutputTokens,
         seed: generationConfig?.seed,
       },
     });

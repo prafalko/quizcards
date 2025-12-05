@@ -12,9 +12,9 @@ Struktura ta prowadzi użytkownika krok po kroku przez główny proces: import f
 - **Nazwa widoku:** Logowanie / Rejestracja (Login / Register View)
 - **Ścieżka widoku:** `/login`, `/register`
 - **Główny cel:** Uwierzytelnienie użytkownika, umożliwienie dostępu do jego prywatnych quizów.
-- **Kluczowe informacje do wyświetlenia:** Formularz logowania (login, hasło), formularz rejestracji (login, hasło), komunikaty o błędach (np. "Użytkownik już istnieje", "Nieprawidłowe dane logowania").
+- **Kluczowe informacje do wyświetlenia:** Formularz logowania (e-mail, hasło), formularz rejestracji (e-mail, hasło), komunikaty o błędach (np. "Użytkownik już istnieje", "Nieprawidłowe dane logowania").
 - **Kluczowe komponenty widoku:**
-  - Formularz rejestracji/logowania: Uniwersalny komponent zawierający pola `input` dla loginu i hasła, przyciski akcji oraz link do przełączania się między logowaniem a rejestracją.
+  - Formularz rejestracji/logowania: Uniwersalny komponent zawierający pola `input` dla adresu e-mail i hasła, przyciski akcji oraz link do przełączania się między logowaniem a rejestracją.
   - Komponent walidacji: Komponent do wyświetlania błędów walidacji lub odpowiedzi z API.
 - **UX, dostępność i względy bezpieczeństwa:**
   - **UX:** Jasne rozróżnienie między logowaniem a rejestracją. Automatyczne przekierowanie do panelu głównego po pomyślnym uwierzytelnieniu.

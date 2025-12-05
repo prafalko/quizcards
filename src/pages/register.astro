@@ -1,0 +1,11 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { RegisterForm } from "@/components/auth/RegisterForm";
+
+const title = "Załóż konto";
+const description = "Twórz, edytuj i rozwiązuj zestawy quizów w jednym miejscu.";
+---
+
+<AuthLayout title={title} description={description}>
+  <RegisterForm client:load />
+</AuthLayout>

@@ -18,7 +18,7 @@ import type {
 import { logger } from "./logger.service";
 import { DatabaseError, NotFoundError, ForbiddenError, AIGenerationError } from "../../lib/errors";
 import { generateIncorrectAnswers, generateQuizFromFlashcards } from "./ai.service";
-import { fetchQuizletSet } from "./quizlet.service";
+import { fetchQuizletSet, parseQuizletJson } from "./quizlet.service";
 
 /**
  * Timeout wrapper for promises
@@ -59,7 +59,6 @@ export class QuizService {
       let quizletSet: QuizletSet;
       if (command.quizlet_json) {
         // Use provided JSON directly (fallback mode)
-        const { parseQuizletJson } = await import("./quizlet.service");
         quizletSet = parseQuizletJson(command.quizlet_json, command.source_url);
       } else {
         // Normal scraping mode
