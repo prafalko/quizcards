@@ -23,6 +23,7 @@ Users can create an account, manage generated quizzes (edit, delete, regenerate 
 • **Frontend**: Astro 5, React 19, TypeScript 5, Tailwind CSS 4, Shadcn/ui (Radix-based)  
 • **Backend**: Supabase (PostgreSQL, Auth, Storage)  
 • **AI**: Google Gemini via Google AI Studio  
+• **Testing**: Playwright (E2E), Vitest (Unit/Integration), React Testing Library  
 • **Tooling**: ESLint, Prettier, Husky + lint-staged  
 • **CI/CD**: GitHub Actions  
 • **Hosting**: DigitalOcean (Docker image)  
@@ -85,7 +86,7 @@ Out-of-scope for MVP:
 
 ## Project Status
 
-![version](https://img.shields.io/badge/version-0.2.0-blue?style=flat-square)
+![version](https://img.shields.io/badge/version-0.3.0-blue?style=flat-square)
 
 The project is in active **MVP development** — core features are being built and are not yet production-ready. Contributions are welcome via Pull Requests.
 
