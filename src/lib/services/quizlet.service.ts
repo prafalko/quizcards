@@ -122,7 +122,7 @@ async function _fetchQuizletData(setId: string): Promise<QuizletApiResponse> {
   try {
     // Launch browser in windowed mode (headless: false) to avoid anti-bot detection
     browser = await chromium.launch({
-      headless: false,
+      headless: true,
       args: [
         "--disable-blink-features=AutomationControlled", // Hide automation flags
       ],
@@ -134,6 +134,17 @@ async function _fetchQuizletData(setId: string): Promise<QuizletApiResponse> {
       viewport: { width: 1280, height: 720 },
       locale: "en-US",
     });
+
+    if (import.meta.env.QUIZLET_COOKIE) {
+      await context.addCookies([
+        {
+          name: "cf_clearance",
+          value: import.meta.env.QUIZLET_COOKIE,
+          domain: ".quizlet.com",
+          path: "/",
+        },
+      ]);
+    }
 
     const page = await context.newPage();
 
