@@ -10,7 +10,7 @@ Search Codebase before taking any action.
 </kod_projektu>
 
 <stos_technologiczny>
-@tech
+@tech-stack.md
 </stos_technologiczny>
 
 Twoim zadaniem jest wygenerowanie szczegółowego planu testów, który będzie dostosowany do specyfiki projektu, uwzględniając wykorzystywane technologie, strukturę kodu oraz kluczowe elementy repozytorium. Plan testów powinien być napisany w języku polskim.
