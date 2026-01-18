@@ -1,14 +1,18 @@
 # Plan implementacji widoku Edycji Quizu
 
 ## 1. Przegląd
+
 Widok Edycji Quizu jest kluczowym interfejsem dla użytkownika, umożliwiającym pełną kontrolę nad treścią quizu po jego wygenerowaniu. Użytkownik może tutaj modyfikować tytuł quizu, edytować tekst każdego pytania i odpowiedzi, usuwać niechciane pytania oraz ponownie generować niepoprawne odpowiedzi przy użyciu AI. Zmiany są zapisywane w sposób wsadowy, co optymalizuje komunikację z serwerem i poprawia doświadczenie użytkownika.
 
 ## 2. Routing widoku
+
 Widok będzie renderowany na stronie Astro i dostępny pod dynamiczną ścieżką:
+
 - **Ścieżka:** `/quizzes/:id/edit`
 - **Renderowanie:** Strona będzie renderowana po stronie serwera (SSR), pobierając dane quizu i przekazując je do interaktywnego komponentu React.
 
 ## 3. Struktura komponentów
+
 Hierarchia komponentów zostanie zaimplementowana w React, wykorzystując komponenty UI z biblioteki Shadcn.
 
 ```
@@ -35,6 +39,7 @@ Hierarchia komponentów zostanie zaimplementowana w React, wykorzystując kompon
 ## 4. Szczegóły komponentów
 
 ### `QuizEditView.tsx`
+
 - **Opis komponentu:** Główny kontener widoku. Inicjalizuje logikę zarządzania stanem za pomocą customowego hooka `useQuizEdit`, odbiera początkowe dane quizu jako `prop` i renderuje wszystkie podkomponenty (`SaveChangesBar`, `EditableTitle`, `QuestionList`).
 - **Główne elementy:** Komponenty-dzieci.
 - **Obsługiwane interakcje:** Przekazuje logikę i stan z hooka `useQuizEdit` do komponentów-dzieci.
@@ -48,6 +53,7 @@ Hierarchia komponentów zostanie zaimplementowana w React, wykorzystując kompon
   ```
 
 ### `SaveChangesBar.tsx`
+
 - **Opis komponentu:** Pasek narzędzi, który jest widoczny tylko wtedy, gdy w quizie są niezapisane zmiany. Zawiera przyciski do zapisywania lub odrzucania zmian.
 - **Główne elementy:** `div` (kontener), `Button` (Shadcn) "Zapisz", `Button` (Shadcn) "Odrzuć zmiany".
 - **Obsługiwane interakcje:** Kliknięcie przycisku "Zapisz" (wywołuje `onSave`), kliknięcie "Odrzuć" (wywołuje `onDiscard`).
@@ -64,6 +70,7 @@ Hierarchia komponentów zostanie zaimplementowana w React, wykorzystując kompon
   ```
 
 ### `EditableTitle.tsx`
+
 - **Opis komponentu:** Wyświetla tytuł quizu jako `h1`. Po kliknięciu zamienia się w pole `input`, umożliwiając edycję.
 - **Główne elementy:** `h1` lub `Input` (Shadcn) w zależności od trybu edycji.
 - **Obsługiwane interakcje:** Kliknięcie na `h1` włącza tryb edycji. Zmiana wartości w `input` i utrata fokusa (onBlur) lub wciśnięcie "Enter" zatwierdza zmianę.
@@ -78,6 +85,7 @@ Hierarchia komponentów zostanie zaimplementowana w React, wykorzystując kompon
   ```
 
 ### `QuestionList.tsx`
+
 - **Opis komponentu:** Iteruje po liście pytań i dla każdego z nich renderuje komponent `QuestionEditForm`.
 - **Główne elementy:** `div` (kontener), `QuestionEditForm[]`.
 - **Obsługiwane interakcje:** Przekazuje zdarzenia z poszczególnych `QuestionEditForm` do głównego komponentu.
@@ -95,6 +103,7 @@ Hierarchia komponentów zostanie zaimplementowana w React, wykorzystując kompon
   ```
 
 ### `QuestionEditForm.tsx`
+
 - **Opis komponentu:** Formularz do edycji pojedynczego pytania. Zawiera pole na treść pytania, cztery pola na odpowiedzi (pierwsze oznaczone jako poprawne) oraz przyciski akcji.
 - **Główne elementy:** `Card` (Shadcn), `Textarea` (Shadcn), `Input` (Shadcn), `Button` (Shadcn). Etykieta "Poprawna odpowiedź" przy pierwszym polu.
 - **Obsługiwane interakcje:** Zmiana treści pytania lub odpowiedzi. Kliknięcie "Generuj odpowiedzi ponownie" lub "Usuń pytanie".
@@ -112,11 +121,13 @@ Hierarchia komponentów zostanie zaimplementowana w React, wykorzystując kompon
   ```
 
 ## 5. Typy
+
 Widok będzie operował na istniejącym typie `QuizDetailDTO` z `src/types.ts`. Nie ma potrzeby tworzenia nowych, złożonych typów ViewModel, ponieważ cała logika będzie zarządzana przez porównywanie stanu początkowego i bieżącego wewnątrz customowego hooka.
 
 - **`QuizDetailDTO`**: Główna struktura danych, zawierająca wszystkie informacje o quizie, jego pytaniach i odpowiedziach.
 
 ## 6. Zarządzanie stanem
+
 Cała logika biznesowa zostanie zamknięta w customowym hooku `useQuizEdit`, aby utrzymać komponent `QuizEditView` czystym i skoncentrowanym na renderowaniu.
 
 - **Hook `useQuizEdit(initialQuiz: QuizDetailDTO)`:**
@@ -130,6 +141,7 @@ Cała logika biznesowa zostanie zamknięta w customowym hooku `useQuizEdit`, aby
   - **Zwracane funkcje i wartości:** Stan `quiz`, flagi `isDirty` i `isSaving` oraz funkcje obsługujące wszystkie akcje użytkownika (`updateTitle`, `updateQuestion`, `updateAnswer`, `handleSaveChanges`, `handleDeleteQuestionRequest` itd.).
 
 ## 7. Integracja API
+
 Komponent będzie integrował się z kilkoma endpointami API w celu odczytu i modyfikacji danych.
 
 - **`GET /api/quizzes/:id`**
@@ -153,6 +165,7 @@ Komponent będzie integrował się z kilkoma endpointami API w celu odczytu i mo
   - **Typ odpowiedzi:** `QuestionDetailDTO`.
 
 ## 8. Interakcje użytkownika
+
 - **Edycja treści:** Kliknięcie na tytuł lub wpisanie tekstu w polach pytań/odpowiedzi aktualizuje stan w hooku i aktywuje `SaveChangesBar`.
 - **Usuwanie pytania:** Kliknięcie "Usuń pytanie" otwiera `ConfirmationDialog`. Po potwierdzeniu, pytanie jest usuwane ze stanu (UI), a zmiana jest oznaczana do zapisu.
 - **Regeneracja odpowiedzi:** Kliknięcie "Generuj..." wywołuje API. Przycisk jest blokowany na czas operacji. Po sukcesie, nowe odpowiedzi pojawiają się w formularzu, a zmiana jest oznaczana do zapisu.
@@ -160,6 +173,7 @@ Komponent będzie integrował się z kilkoma endpointami API w celu odczytu i mo
 - **Odrzucanie zmian:** Kliknięcie "Odrzuć zmiany" przywraca stan quizu do ostatniej zapisanej wersji i ukrywa `SaveChangesBar`.
 
 ## 9. Warunki i walidacja
+
 - **Po stronie klienta:**
   - Wszystkie pola tekstowe (tytuł, pytania, odpowiedzi) nie mogą być puste.
   - Przycisk "Zapisz" będzie nieaktywny, jeśli którekolwiek z pól jest puste. Komunikaty o błędach walidacji będą wyświetlane przy odpowiednich polach.
@@ -167,11 +181,13 @@ Komponent będzie integrował się z kilkoma endpointami API w celu odczytu i mo
   - API waliduje długość i format danych. Frontend powinien zapobiegać wysyłaniu nieprawidłowych danych, ale musi być przygotowany na obsługę błędów walidacji z API.
 
 ## 10. Obsługa błędów
+
 - **Błąd pobierania danych:** Jeśli `GET /api/quizzes/:id` zawiedzie po stronie serwera, Astro powinno zwrócić stronę błędu (np. 404 lub 500).
 - **Błąd zapisu:** W przypadku niepowodzenia którejkolwiek z operacji w procesie wsadowego zapisu, cały proces jest uznawany za nieudany. Użytkownik otrzymuje powiadomienie "toast" z informacją o błędzie, a interfejs pozostaje w stanie edycji, umożliwiając ponowną próbę zapisu.
 - **Błąd regeneracji odpowiedzi:** W przypadku niepowodzenia, użytkownik zobaczy powiadomienie "toast" informujące o problemie, a odpowiedzi w formularzu pozostaną niezmienione.
 
 ## 11. Kroki implementacji
+
 1.  **Struktura plików:** Utworzenie plików `.tsx` dla `QuizEditView`, `SaveChangesBar`, `EditableTitle`, `QuestionList`, `QuestionEditForm` w `src/components/`.
 2.  **Strona Astro:** Stworzenie pliku `src/pages/quizzes/[id]/edit.astro`, który będzie pobierał dane quizu po stronie serwera i renderował komponent `QuizEditView` z `client:load`.
 3.  **Komponenty "liście":** Implementacja `EditableTitle` i `QuestionEditForm` jako w pełni kontrolowanych komponentów, które przyjmują dane i emitują zdarzenia `onChange`.

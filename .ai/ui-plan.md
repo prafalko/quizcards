@@ -9,6 +9,7 @@ Struktura ta prowadzi użytkownika krok po kroku przez główny proces: import f
 ## 2. Lista widoków
 
 ### Widok 1: Logowanie / Rejestracja
+
 - **Nazwa widoku:** Logowanie / Rejestracja (Login / Register View)
 - **Ścieżka widoku:** `/login`, `/register`
 - **Główny cel:** Uwierzytelnienie użytkownika, umożliwienie dostępu do jego prywatnych quizów.
@@ -22,6 +23,7 @@ Struktura ta prowadzi użytkownika krok po kroku przez główny proces: import f
   - **Bezpieczeństwo:** Komunikacja z API przez HTTPS. Hasła nie są przechowywane w stanie aplikacji.
 
 ### Widok 2: Panel Główny / Lista Quizów
+
 - **Nazwa widoku:** Panel Główny (Dashboard / Quiz List View)
 - **Ścieżka widoku:** `/` lub `/dashboard`
 - **Główny cel:** Wyświetlenie wszystkich quizów użytkownika, umożliwienie generowania nowych oraz zarządzanie istniejącymi.
@@ -37,6 +39,7 @@ Struktura ta prowadzi użytkownika krok po kroku przez główny proces: import f
   - **Bezpieczeństwo:** Wszystkie akcje (pobieranie listy, usuwanie) wymagają uwierzytelnienia i są autoryzowane po stronie serwera.
 
 ### Widok 3: Edycja Quizu
+
 - **Nazwa widoku:** Edycja Quizu (Quiz Edit View)
 - **Ścieżka widoku:** `/quizzes/:id/edit`
 - **Główny cel:** Umożliwienie użytkownikowi przeglądu, modyfikacji i weryfikacji pytań oraz odpowiedzi wygenerowanych przez AI.
@@ -52,6 +55,7 @@ Struktura ta prowadzi użytkownika krok po kroku przez główny proces: import f
   - **Bezpieczeństwo:** Użytkownik może edytować tylko swoje quizy (autoryzacja po stronie API). Dane wejściowe są walidowane.
 
 ### Widok 4: Rozwiązywanie Quizu
+
 - **Nazwa widoku:** Rozwiązywanie Quizu (Quiz Solving View)
 - **Ścieżka widoku:** `/quizzes/:id/play`
 - **Główny cel:** Przeprowadzenie użytkownika przez proces odpowiadania na pytania w quizie.
@@ -66,6 +70,7 @@ Struktura ta prowadzi użytkownika krok po kroku przez główny proces: import f
   - **Bezpieczeństwo:** Identyfikator quizu w URL jest weryfikowany, aby upewnić się, że użytkownik ma do niego dostęp.
 
 ### Widok 5: Podsumowanie Wyników
+
 - **Nazwa widoku:** Podsumowanie Wyników (Quiz Results View)
 - **Ścieżka widoku:** `/quizzes/:id/results`
 - **Główny cel:** Prezentacja wyników po zakończeniu quizu, umożliwiająca analizę błędów.

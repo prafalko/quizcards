@@ -59,27 +59,27 @@ Niniejszy dokument opisuje kompleksowy plan testów dla aplikacji QuizCards. Cel
 
 ## 4. Scenariusze testowe dla kluczowych funkcjonalności
 
-| Funkcjonalność                | Scenariusz                                                                                                                                                               | Typ testu              | Priorytet |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------- | --------- |
-| **Rejestracja**               | Użytkownik podaje poprawne dane i tworzy konto.                                                                                                                          | E2E, Integracyjny      | Krytyczny |
-|                               | Użytkownik podaje niepoprawny email / hasło i widzi błąd walidacji.                                                                                                        | E2E, Jednostkowy       | Krytyczny |
-|                               | Użytkownik próbuje zarejestrować się na istniejący email.                                                                                                                | E2E, Integracyjny      | Krytyczny |
-| **Logowanie**                 | Użytkownik podaje poprawne dane i zostaje zalogowany.                                                                                                                    | E2E, Integracyjny      | Krytyczny |
-|                               | Użytkownik podaje błędne dane i widzi komunikat o błędzie.                                                                                                               | E2E, Jednostkowy       | Krytyczny |
-| **Tworzenie quizu**           | Zalogowany użytkownik tworzy quiz z publicznego linku Quizlet.                                                                                                            | E2E, Integracyjny      | Wysoki    |
-|                               | Zalogowany użytkownik tworzy quiz na podstawie wklejonego tekstu.                                                                                                          | E2E, Integracyjny      | Wysoki    |
-|                               | Użytkownik podaje niepoprawny link Quizlet i widzi błąd.                                                                                                                 | E2E, Jednostkowy       | Średni    |
-|                               | Integracja z Gemini AI zwraca błąd podczas generowania pytań.                                                                                                              | Integracyjny           | Wysoki    |
-| **Edycja quizu**              | Użytkownik zmienia tytuł quizu.                                                                                                                                          | E2E, Integracyjny      | Wysoki    |
-|                               | Użytkownik dodaje nowe pytanie z odpowiedziami.                                                                                                                          | E2E, Integracyjny      | Wysoki    |
-|                               | Użytkownik edytuje istniejące pytanie/odpowiedź.                                                                                                                          | E2E, Integracyjny      | Wysoki    |
-|                               | Użytkownik usuwa pytanie.                                                                                                                                                | E2E, Integracyjny      | Wysoki    |
-|                               | Użytkownik próbuje edytować quiz, który do niego nie należy.                                                                                                             | Integracyjny, E2E      | Krytyczny |
-| **Rozgrywka i wyniki**        | Użytkownik przechodzi cały quiz, odpowiadając na pytania.                                                                                                                | E2E                    | Wysoki    |
-|                               | Użytkownik kończy quiz i widzi ekran wyników z poprawnym podsumowaniem.                                                                                                  | E2E, Integracyjny      | Wysoki    |
-| **API**                       | Endpointy API zwracają błąd 401 dla niezalogowanego użytkownika.                                                                                                         | Integracyjny           | Krytyczny |
-|                               | Endpointy API zwracają błąd 403 przy próbie dostępu do cudzych zasobów.                                                                                                  | Integracyjny           | Krytyczny |
-|                               | Endpointy API poprawnie walidują dane wejściowe (np. za krótkie hasło, niepoprawny format danych).                                                                        | Integracyjny, Jednost. | Krytyczny |
+| Funkcjonalność         | Scenariusz                                                                                         | Typ testu              | Priorytet |
+| ---------------------- | -------------------------------------------------------------------------------------------------- | ---------------------- | --------- |
+| **Rejestracja**        | Użytkownik podaje poprawne dane i tworzy konto.                                                    | E2E, Integracyjny      | Krytyczny |
+|                        | Użytkownik podaje niepoprawny email / hasło i widzi błąd walidacji.                                | E2E, Jednostkowy       | Krytyczny |
+|                        | Użytkownik próbuje zarejestrować się na istniejący email.                                          | E2E, Integracyjny      | Krytyczny |
+| **Logowanie**          | Użytkownik podaje poprawne dane i zostaje zalogowany.                                              | E2E, Integracyjny      | Krytyczny |
+|                        | Użytkownik podaje błędne dane i widzi komunikat o błędzie.                                         | E2E, Jednostkowy       | Krytyczny |
+| **Tworzenie quizu**    | Zalogowany użytkownik tworzy quiz z publicznego linku Quizlet.                                     | E2E, Integracyjny      | Wysoki    |
+|                        | Zalogowany użytkownik tworzy quiz na podstawie wklejonego tekstu.                                  | E2E, Integracyjny      | Wysoki    |
+|                        | Użytkownik podaje niepoprawny link Quizlet i widzi błąd.                                           | E2E, Jednostkowy       | Średni    |
+|                        | Integracja z Gemini AI zwraca błąd podczas generowania pytań.                                      | Integracyjny           | Wysoki    |
+| **Edycja quizu**       | Użytkownik zmienia tytuł quizu.                                                                    | E2E, Integracyjny      | Wysoki    |
+|                        | Użytkownik dodaje nowe pytanie z odpowiedziami.                                                    | E2E, Integracyjny      | Wysoki    |
+|                        | Użytkownik edytuje istniejące pytanie/odpowiedź.                                                   | E2E, Integracyjny      | Wysoki    |
+|                        | Użytkownik usuwa pytanie.                                                                          | E2E, Integracyjny      | Wysoki    |
+|                        | Użytkownik próbuje edytować quiz, który do niego nie należy.                                       | Integracyjny, E2E      | Krytyczny |
+| **Rozgrywka i wyniki** | Użytkownik przechodzi cały quiz, odpowiadając na pytania.                                          | E2E                    | Wysoki    |
+|                        | Użytkownik kończy quiz i widzi ekran wyników z poprawnym podsumowaniem.                            | E2E, Integracyjny      | Wysoki    |
+| **API**                | Endpointy API zwracają błąd 401 dla niezalogowanego użytkownika.                                   | Integracyjny           | Krytyczny |
+|                        | Endpointy API zwracają błąd 403 przy próbie dostępu do cudzych zasobów.                            | Integracyjny           | Krytyczny |
+|                        | Endpointy API poprawnie walidują dane wejściowe (np. za krótkie hasło, niepoprawny format danych). | Integracyjny, Jednost. | Krytyczny |
 
 ## 5. Środowisko testowe
 

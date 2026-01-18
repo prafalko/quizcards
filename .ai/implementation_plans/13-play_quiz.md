@@ -1,14 +1,18 @@
 # Plan implementacji widoku Rozwiązywania Quizu
 
 ## 1. Przegląd
+
 Widok Rozwiązywania Quizu stanowi interaktywny interfejs, który przeprowadza użytkownika przez proces odpowiadania na pytania. Jego głównym celem jest zapewnienie skoncentrowanego i wolnego od rozpraszaczy środowiska do nauki. Po udzieleniu odpowiedzi na ostatnie pytanie, użytkownik zostanie automatycznie przekierowany do osobnego widoku z podsumowaniem wyników.
 
 ## 2. Routing widoku
+
 Widok będzie renderowany na stronie Astro i dostępny pod dynamiczną ścieżką:
+
 - **Ścieżka:** `/quizzes/:id/play`
 - **Renderowanie:** Strona będzie renderowana po stronie serwera (SSR). Dane quizu zostaną pobrane na serwerze i przekazane jako początkowy stan do interaktywnego komponentu React.
 
 ## 3. Struktura komponentów
+
 Hierarchia komponentów zostanie zaimplementowana w React, z wykorzystaniem komponentów UI z biblioteki Shadcn.
 
 ```
@@ -24,6 +28,7 @@ Hierarchia komponentów zostanie zaimplementowana w React, z wykorzystaniem komp
 ## 4. Szczegóły komponentów
 
 ### `QuizPlayView.tsx`
+
 - **Opis komponentu:** Główny kontener widoku po stronie klienta. Inicjalizuje logikę zarządzania stanem za pomocą customowego hooka `useQuizPlay`. Renderuje interfejs aktywnej sesji quizu, w tym wskaźnik postępu, treść bieżącego pytania oraz zestaw przycisków z odpowiedziami.
 - **Główne elementy:** Komponent `Progress` z Shadcn, `h2` ("Pytanie 5/20"), `QuestionDisplay`, `AnswerOptions`.
 - **Obsługiwane interakcje:** Obsługuje wybór odpowiedzi i zarządza przejściem do kolejnego pytania lub przekierowaniem po zakończeniu quizu.
@@ -37,6 +42,7 @@ Hierarchia komponentów zostanie zaimplementowana w React, z wykorzystaniem komp
   ```
 
 ### `QuestionDisplay.tsx`
+
 - **Opis komponentu:** Prosty komponent, którego jedynym zadaniem jest wyświetlenie tekstu bieżącego pytania.
 - **Główne elementy:** `div` (kontener), `p` (tekst pytania).
 - **Obsługiwane interakcje:** Brak.
@@ -50,6 +56,7 @@ Hierarchia komponentów zostanie zaimplementowana w React, z wykorzystaniem komp
   ```
 
 ### `AnswerOptions.tsx`
+
 - **Opis komponentu:** Renderuje listę odpowiedzi dla bieżącego pytania jako klikalne przyciski. Kolejność odpowiedzi jest losowa.
 - **Główne elementy:** `div` (kontener w układzie siatki), `Button[]` (Shadcn).
 - **Obsługiwane interakcje:** Kliknięcie na przycisk odpowiedzi wywołuje `onSelect` z ID wybranej odpowiedzi.
@@ -64,16 +71,19 @@ Hierarchia komponentów zostanie zaimplementowana w React, z wykorzystaniem komp
   ```
 
 ## 5. Typy
+
 Do zarządzania stanem interfejsu potrzebne będą nowe, uproszczone typy `ViewModel`.
 
 - **`QuizAnswerViewModel`**: Reprezentuje pojedynczą odpowiedź w UI.
+
   ```typescript
   type QuizAnswerViewModel = AnswerDTO;
   ```
 
 - **`QuizQuestionViewModel`**: Reprezentuje pytanie z losowo ułożonymi odpowiedziami.
+
   ```typescript
-  type QuizQuestionViewModel = Omit<QuestionDetailDTO, 'answers'> & {
+  type QuizQuestionViewModel = Omit<QuestionDetailDTO, "answers"> & {
     answers: QuizAnswerViewModel[]; // Odpowiedzi w losowej kolejności
   };
   ```
@@ -87,6 +97,7 @@ Do zarządzania stanem interfejsu potrzebne będą nowe, uproszczone typy `ViewM
   ```
 
 ## 6. Zarządzanie stanem
+
 Logika biznesowa zostanie zamknięta w customowym hooku `useQuizPlay`, aby utrzymać komponenty czystymi i skoncentrowanymi na renderowaniu.
 
 - **Hook `useQuizPlay(initialQuiz: QuizDetailDTO)`:**
@@ -103,6 +114,7 @@ Logika biznesowa zostanie zamknięta w customowym hooku `useQuizPlay`, aby utrzy
   - **Zwracane wartości:** Wszystkie stany i funkcje potrzebne komponentom do renderowania UI i obsługi interakcji.
 
 ## 7. Integracja API
+
 Widok będzie integrował się z dwoma endpointami API.
 
 - **`GET /api/quizzes/:id`**
@@ -117,22 +129,26 @@ Widok będzie integrował się z dwoma endpointami API.
   - **Typ odpowiedzi:** `QuizSummaryDTO` (odpowiedź może zostać zignorowana).
 
 ## 8. Interakcje użytkownika
+
 - **Start quizu:** Użytkownik nawiguje na stronę. Dane są ładowane, a interfejs quizu jest natychmiast wyświetlany z pierwszym pytaniem.
 - **Wybór odpowiedzi:** Użytkownik klika jeden z czterech przycisków odpowiedzi.
 - **Przejście do kolejnego pytania:** Po kliknięciu odpowiedzi, interfejs automatycznie, bez dodatkowej akcji, przechodzi do następnego pytania. Nie jest pokazywana informacja zwrotna o poprawności.
 - **Zakończenie quizu:** Po udzieleniu odpowiedzi na ostatnie pytanie, aplikacja zapisuje sesję i automatycznie przekierowuje użytkownika na dedykowaną stronę wyników pod adresem `/quizzes/:id/results`.
 
 ## 9. Warunki i walidacja
+
 - **Po stronie klienta:**
   - Przed rozpoczęciem quizu, w hooku `useQuizPlay` nastąpi sprawdzenie, czy pobrany quiz zawiera jakiekolwiek pytania. Jeśli nie, zostanie wyświetlony odpowiedni komunikat.
   - Nie ma pól do walidacji wprowadzanych przez użytkownika.
 
 ## 10. Obsługa błędów
+
 - **Błąd pobierania danych:** Jeśli `GET /api/quizzes/:id` na serwerze zwróci błąd (np. 404 Not Found), strona Astro powinna wyrenderować odpowiednią stronę błędu.
 - **Błąd aktualizacji statusu:** Ewentualny błąd przy żądaniu `PATCH` nie powinien przerywać quizu. Błąd zostanie zarejestrowany w konsoli, ale użytkownik będzie mógł kontynuować rozwiązywanie.
 - **Quiz bez pytań:** Jeśli pobrany quiz ma pustą listę pytań, komponent `QuizPlayView` wyświetli komunikat "Ten quiz nie zawiera żadnych pytań" z przyciskiem do powrotu.
 
 ## 11. Kroki implementacji
+
 1.  **Struktura plików:** Utworzenie pliku `.astro` dla strony oraz plików `.tsx` dla komponentów `QuizPlayView`, `QuestionDisplay` i `AnswerOptions` w odpowiednich katalogach.
 2.  **Strona Astro:** Implementacja `src/pages/quizzes/[id]/play.astro` w celu pobrania danych quizu po stronie serwera (SSR) i przekazania ich jako props do komponentu `QuizPlayView` renderowanego z dyrektywą `client:load`.
 3.  **Typy:** Zdefiniowanie typów `ViewModel` (`QuizQuestionViewModel`, `QuizAnswerViewModel`) oraz `UserAnswer`.

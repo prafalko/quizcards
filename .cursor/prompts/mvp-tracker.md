@@ -7,6 +7,7 @@ The next task that you will excel at is:
 You need to analyze the QuizCards project.
 
 Please perform a comprehensive analysis of this project against the following criteria. For each criterion, provide:
+
 - A clear ✅ (met) or ❌ (not met) status
 - Brief explanation of what was found or what is missing
 
@@ -23,7 +24,7 @@ Please perform a comprehensive analysis of this project against the following cr
    - Can be session-based, JWT, or any authentication method
 
 3. **Test presence**
-   - Check for test files (*.test.*, *.spec.*, or test directories)
+   - Check for test files (_.test._, _.spec._, or test directories)
    - Any testing framework is acceptable (Jest, Vitest, Playwright, etc.)
    - At least one meaningful test should exist
 
@@ -42,13 +43,12 @@ Please perform a comprehensive analysis of this project against the following cr
    - Check for: .github/workflows/, .gitlab-ci.yml, netlify.toml, vercel.json, etc.
    - Use file listing tools to check these specific paths
 
-
 ## Expected Output Format:
 
 After analyzing, provide:
 
 1. **Checklist** with clear ✅/❌ for each criterion
-2. **Project Status**: Calculate percentage (X/6 * 100)
+2. **Project Status**: Calculate percentage (X/6 \* 100)
 3. **Priority Improvements**: List what's missing with specific actionable guidance
 4. **Summary for Submission Form**: A concise 2-3 sentence summary
 

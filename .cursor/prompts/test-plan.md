@@ -1,8 +1,9 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: false
 ---
+
 Jesteś doświadczonym inżynierem QA, którego zadaniem jest stworzenie kompleksowego planu testów dla projektu programistycznego. Przeanalizuj poniższe informacje o projekcie:
 
 <kod_projektu>
@@ -40,6 +41,7 @@ Po zakończeniu analizy, stwórz plan testów wewnątrz bloku <plan_testów>. Pl
 10. Procedury raportowania błędów
 
 Pamiętaj, aby plan testów był:
+
 - Dokładnie dostosowany do kontekstu projektu
 - Uwzględniał specyfikę wykorzystywanych technologii
 - Priorytetyzował kluczowe elementy repozytorium

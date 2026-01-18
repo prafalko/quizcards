@@ -141,22 +141,22 @@ ErrorResponse {
 
 ### Plan wdrożenia vs. Implementacja
 
-| Wymaganie planu              | Status | Uwagi                          |
-| ---------------------------- | ------ | ------------------------------ |
-| Metoda GET                   | ✅     | Zaimplementowano               |
-| Endpoint /api/quizzes/:id    | ✅     | Zaimplementowano               |
-| Walidacja UUID               | ✅     | validateId()                   |
-| Pobieranie quizu + pytania + odpowiedzi | ✅     | JOIN query                     |
-| QuizDetailDTO                | ✅     | Typ z types.ts                 |
-| QuestionDetailDTO            | ✅     | Typ z types.ts                 |
-| AnswerDTO                    | ✅     | Typ z types.ts                 |
-| IDOR Protection              | ✅     | Filter by user_id + id         |
-| Kody 200, 400, 404, 500      | ✅     | Wszystkie obsłużone            |
-| LoggerService                | ✅     | Pełne logowanie                |
-| Correlation ID               | ✅     | W nagłówkach                   |
-| Testy                        | ✅     | 4 testów                       |
-| Optymalizacja zapytań        | ✅     | Single JOIN query              |
-| Cache headers                | ✅     | no-cache + ETag                |
+| Wymaganie planu                         | Status | Uwagi                  |
+| --------------------------------------- | ------ | ---------------------- |
+| Metoda GET                              | ✅     | Zaimplementowano       |
+| Endpoint /api/quizzes/:id               | ✅     | Zaimplementowano       |
+| Walidacja UUID                          | ✅     | validateId()           |
+| Pobieranie quizu + pytania + odpowiedzi | ✅     | JOIN query             |
+| QuizDetailDTO                           | ✅     | Typ z types.ts         |
+| QuestionDetailDTO                       | ✅     | Typ z types.ts         |
+| AnswerDTO                               | ✅     | Typ z types.ts         |
+| IDOR Protection                         | ✅     | Filter by user_id + id |
+| Kody 200, 400, 404, 500                 | ✅     | Wszystkie obsłużone    |
+| LoggerService                           | ✅     | Pełne logowanie        |
+| Correlation ID                          | ✅     | W nagłówkach           |
+| Testy                                   | ✅     | 4 testów               |
+| Optymalizacja zapytań                   | ✅     | Single JOIN query      |
+| Cache headers                           | ✅     | no-cache + ETag        |
 
 ## 🚀 Uruchamianie testów
 
