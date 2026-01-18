@@ -3,7 +3,6 @@ import {
   updateLastActivity,
   shouldLogoutDueToInactivity,
   clearActivity,
-  getInactivityTimeout,
 } from "../../lib/activity-tracker";
 
 /**

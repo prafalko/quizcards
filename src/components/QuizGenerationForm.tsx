@@ -202,7 +202,7 @@ export function QuizGenerationForm({
               Po otwarciu linku powyżej, skopiuj całą zawartość strony (powinna być w formacie JSON) i wklej ją tutaj.
               Najłatwiej: naciśnij na stronie klawisze Ctrl i A jednocześnie, potem Ctrl i C, żeby skopiować, a
               następnie wklej przez Ctrl + V wszystko do pola poniżej. Jeśli korzystasz z telefonu, przytrzymaj palec na
-              stronie, wybierz "Zaznacz wszystko", potem "Kopiuj" i wklej tutaj.
+              stronie, wybierz &quot;Zaznacz wszystko&quot;, potem &quot;Kopiuj&quot; i wklej tutaj.
             </p>
             <Textarea
               id="quizlet-json"
