@@ -5,25 +5,25 @@ on:
     branches: [ master ]
 
 jobs:
-lint-and-build:
-  runs-on: ubuntu-latest
-  env:
-    SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-    SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-    SUPABASE_DEFAULT_USER_ID: ${{ secrets.SUPABASE_DEFAULT_USER_ID }}
-    GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-    QUIZLET_COOKIE: ${{ secrets.QUIZLET_COOKIE }}
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+  lint-and-build:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      SUPABASE_DEFAULT_USER_ID: ${{ secrets.SUPABASE_DEFAULT_USER_ID }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      QUIZLET_COOKIE: ${{ secrets.QUIZLET_COOKIE }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: '.nvmrc'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
 
-    - name: Install dependencies
+      - name: Install dependencies
         run: npm ci
 
       - name: Lint code
