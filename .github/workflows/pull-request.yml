@@ -7,12 +7,6 @@ on:
 jobs:
   lint-and-build:
     runs-on: ubuntu-latest
-    env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-      SUPABASE_DEFAULT_USER_ID: ${{ secrets.SUPABASE_DEFAULT_USER_ID }}
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      QUIZLET_COOKIE: ${{ secrets.QUIZLET_COOKIE }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -35,12 +29,6 @@ jobs:
   unit-test:
     runs-on: ubuntu-latest
     needs: lint-and-build
-    env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-      SUPABASE_DEFAULT_USER_ID: ${{ secrets.SUPABASE_DEFAULT_USER_ID }}
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      QUIZLET_COOKIE: ${{ secrets.QUIZLET_COOKIE }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
