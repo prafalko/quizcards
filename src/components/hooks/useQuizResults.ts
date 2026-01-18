@@ -12,7 +12,7 @@ export function useQuizResults(initialQuiz: QuizDetailDTO) {
   useEffect(() => {
     try {
       // Pobierz odpowiedzi użytkownika z sessionStorage
-      const answersKey = `quiz-${initialQuiz.id}-answers`;
+      const { answersKey } = getQuizStorageKeys(initialQuiz.id);
       const answersData = sessionStorage.getItem(answersKey);
 
       if (!answersData) {
@@ -78,21 +78,19 @@ export function useQuizResults(initialQuiz: QuizDetailDTO) {
     return Math.round((correctAnswers / results.length) * 100);
   };
 
-  const handlePlayAgain = () => {
-    // Wyczyść sesję i przejdź do rozwiązywania quizu
-    const answersKey = `quiz-${initialQuiz.id}-answers`;
-    const questionsKey = `quiz-${initialQuiz.id}-questions`;
+  const clearQuizSession = () => {
+    const { answersKey, questionsKey } = getQuizStorageKeys(initialQuiz.id);
     sessionStorage.removeItem(answersKey);
     sessionStorage.removeItem(questionsKey);
+  };
+
+  const handlePlayAgain = () => {
+    clearQuizSession();
     window.location.assign(`/quizzes/${initialQuiz.id}/play`);
   };
 
   const handleGoToDashboard = () => {
-    // Wyczyść sesję i przejdź do dashboard
-    const answersKey = `quiz-${initialQuiz.id}-answers`;
-    const questionsKey = `quiz-${initialQuiz.id}-questions`;
-    sessionStorage.removeItem(answersKey);
-    sessionStorage.removeItem(questionsKey);
+    clearQuizSession();
     window.location.assign("/");
   };
 
@@ -104,3 +102,8 @@ export function useQuizResults(initialQuiz: QuizDetailDTO) {
     handleGoToDashboard,
   };
 }
+
+const getQuizStorageKeys = (quizId: string) => ({
+  answersKey: `quiz-${quizId}-answers`,
+  questionsKey: `quiz-${quizId}-questions`,
+});
