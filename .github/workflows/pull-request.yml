@@ -1,7 +1,8 @@
-name: Build and Test
+name: Pull Request CI
 
 on:
-  push:
+  pull_request:
+    branches: [ master ]
 
 jobs:
   lint-and-build:
@@ -63,3 +64,24 @@ jobs:
           name: coverage-report
           path: coverage/
           retention-days: 30
+
+  status-comment:
+    runs-on: ubuntu-latest
+    needs: [lint-and-build, unit-test]
+    if: success()
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment PR with success status
+        uses: actions/github-script@v8
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '? **CI Pipeline Passed Successfully!**\n\n' +
+                    '- ? Linting and Build\n' +
+                    '- ? Unit Tests with Coverage\n\n' +
+                    'All checks passed. This PR is ready for review!'
+            })
