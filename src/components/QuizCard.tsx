@@ -15,9 +15,9 @@ export function QuizCard({ quiz, onDelete }: QuizCardProps) {
   };
 
   return (
-    <Card>
+    <Card data-testid="quiz-card">
       <CardHeader>
-        <CardTitle>{quiz.title}</CardTitle>
+        <CardTitle data-testid="quiz-card-title">{quiz.title}</CardTitle>
         <CardDescription>
           {quiz.question_count} {quiz.question_count === 1 ? "pytanie" : "pytań"}
         </CardDescription>
@@ -32,7 +32,7 @@ export function QuizCard({ quiz, onDelete }: QuizCardProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <div>
-                <Button disabled>
+                <Button disabled data-testid="quiz-card-play-button">
                   <span>Rozwiąż</span>
                 </Button>
               </div>
@@ -42,14 +42,14 @@ export function QuizCard({ quiz, onDelete }: QuizCardProps) {
             </TooltipContent>
           </Tooltip>
         ) : (
-          <Button asChild>
+          <Button asChild data-testid="quiz-card-play-button">
             <a href={`/quizzes/${quiz.id}/play`}>Rozwiąż</a>
           </Button>
         )}
-        <Button variant="outline" asChild>
+        <Button variant="outline" asChild data-testid="quiz-card-edit-button">
           <a href={`/quizzes/${quiz.id}/edit`}>Edytuj</a>
         </Button>
-        <Button variant="destructive" onClick={handleDelete}>
+        <Button variant="destructive" onClick={handleDelete} data-testid="quiz-card-delete-button">
           Usuń
         </Button>
       </CardFooter>

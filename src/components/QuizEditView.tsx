@@ -94,7 +94,7 @@ export function QuizEditView({ initialQuiz }: QuizEditViewProps) {
               <EditableTitle initialTitle={quiz.title} onChange={updateTitle} />
             </div>
             <div className="flex-shrink-0">
-              <Button variant="outline" onClick={handleReturnClick}>
+              <Button variant="outline" onClick={handleReturnClick} data-testid="return-to-quiz-list-button">
                 Powróć do listy quizów
               </Button>
             </div>

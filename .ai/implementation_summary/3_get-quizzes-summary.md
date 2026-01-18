@@ -125,22 +125,22 @@ ErrorResponse {
 
 ### Plan wdrożenia vs. Implementacja
 
-| Wymaganie planu                 | Status | Uwagi                          |
-| ------------------------------- | ------ | ------------------------------ |
-| Metoda GET                      | ✅     | Zaimplementowano               |
-| Endpoint /api/quizzes           | ✅     | Zaimplementowano               |
-| Parametr status (draft/published)| ✅     | Optional enum validation       |
-| QuizzesListQueryParams          | ✅     | Typ z types.ts                 |
-| QuizzesListDTO                  | ✅     | Typ z types.ts                 |
-| QuizListItemDTO                 | ✅     | Typ z types.ts                 |
-| IDOR Protection                 | ✅     | Filter by user_id              |
-| Sortowanie (newest first)       | ✅     | ORDER BY created_at DESC       |
-| Zliczanie pytań                 | ✅     | JOIN + array.length            |
-| Kody 200, 400, 500              | ✅     | Wszystkie obsłużone            |
-| LoggerService                   | ✅     | Pełne logowanie                |
-| Correlation ID                  | ✅     | W nagłówkach                   |
-| Testy                           | ✅     | 4 testów                       |
-| Optymalizacja zapytań           | ✅     | Single query z JOIN            |
+| Wymaganie planu                   | Status | Uwagi                    |
+| --------------------------------- | ------ | ------------------------ |
+| Metoda GET                        | ✅     | Zaimplementowano         |
+| Endpoint /api/quizzes             | ✅     | Zaimplementowano         |
+| Parametr status (draft/published) | ✅     | Optional enum validation |
+| QuizzesListQueryParams            | ✅     | Typ z types.ts           |
+| QuizzesListDTO                    | ✅     | Typ z types.ts           |
+| QuizListItemDTO                   | ✅     | Typ z types.ts           |
+| IDOR Protection                   | ✅     | Filter by user_id        |
+| Sortowanie (newest first)         | ✅     | ORDER BY created_at DESC |
+| Zliczanie pytań                   | ✅     | JOIN + array.length      |
+| Kody 200, 400, 500                | ✅     | Wszystkie obsłużone      |
+| LoggerService                     | ✅     | Pełne logowanie          |
+| Correlation ID                    | ✅     | W nagłówkach             |
+| Testy                             | ✅     | 4 testów                 |
+| Optymalizacja zapytań             | ✅     | Single query z JOIN      |
 
 ## 🚀 Uruchamianie testów
 

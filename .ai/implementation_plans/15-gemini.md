@@ -5,6 +5,7 @@
 Usługa `GeminiService` będzie stanowić centralny punkt integracji z API Google Gemini w aplikacji QuizCards. Jej głównym zadaniem jest abstrakcja logiki komunikacji z API, zarządzanie tworzeniem zapytań (promptów), walidacja odpowiedzi oraz obsługa błędów. Usługa zostanie zaprojektowana w sposób modułowy, aby ułatwić testowanie, konserwację i przyszłą rozbudowę.
 
 Główne cele usługi:
+
 - **Enkapsulacja logiki:** Ukrycie złożoności interakcji z `@google/generative-ai` SDK.
 - **Generowanie treści:** Dostarczenie metod do generowania ustrukturyzowanych danych, takich jak quizy, na podstawie zapytań w języku naturalnym.
 - **Przetwarzanie wsadowe:** Optymalizacja zapytań do AI poprzez grupowanie wielu fiszek w jedno zapytanie, co znacząco redukuje koszty i zapobiega błędom `429 Too Many Requests`.
@@ -14,6 +15,7 @@ Główne cele usługi:
 ## 2. Architektura Usługi
 
 Usługa zostanie podzielona na dwie warstwy:
+
 1.  **`GeminiService` (klasa):** Niskopoziomowa, generyczna klasa opakowująca SDK Gemini. Jej głównym zadaniem jest wykonanie zapytania i zwalidowanie odpowiedzi względem dowolnego schematu Zod. Jest reużywalna i nie posiada logiki biznesowej specyficznej dla QuizCards.
 2.  **Funkcje publiczne (`ai.service.ts`):** Wysokopoziomowe funkcje, takie jak `generateQuizFromFlashcards`, które wykorzystują instancję `GeminiService` do realizacji konkretnych zadań biznesowych. To tutaj definiowane są prompty i schematy odpowiedzi.
 
@@ -52,9 +54,9 @@ Jest to generyczna metoda publiczna, która będzie głównym interfejsem usług
 
 - **Cel:** Generowanie ustrukturyzowanych danych w formacie JSON na podstawie podanego schematu Zod.
 - **Parametry:**
-    - `systemPrompt` (string): Instrukcja dla modelu, która definiuje jego rolę i ogólne zasady.
-    - `userPrompt` (string): Konkretne polecenie od użytkownika.
-    - `schema` (T extends z.ZodTypeAny): Schemat Zod definiujący oczekiwaną strukturę odpowiedzi.
+  - `systemPrompt` (string): Instrukcja dla modelu, która definiuje jego rolę i ogólne zasady.
+  - `userPrompt` (string): Konkretne polecenie od użytkownika.
+  - `schema` (T extends z.ZodTypeAny): Schemat Zod definiujący oczekiwaną strukturę odpowiedzi.
 - **Zwraca:** `Promise<z.infer<T>>` - Obiekt zgodny ze zdefiniowanym schematem.
 - **Rzuca błędy:** W przypadku problemów z API, walidacją lub filtrami bezpieczeństwa, metoda będzie rzucać customowe błędy (patrz sekcja 6. Obsługa błędów).
 
@@ -64,24 +66,24 @@ Jest to generyczna metoda publiczna, która będzie głównym interfejsem usług
 
 - **Cel:** Inicjalizacja i zwrócenie instancji modelu generatywnego z odpowiednią konfiguracją.
 - **Parametry:**
-    - `generationConfig` (object): Obiekt konfiguracyjny dla modelu (temperatura, `responseMimeType` itp.).
+  - `generationConfig` (object): Obiekt konfiguracyjny dla modelu (temperatura, `responseMimeType` itp.).
 - **Zwraca:** Instancję `GenerativeModel`.
 
 #### `private buildPrompt(...)`
 
 - **Cel:** Zbudowanie pełnego, sformatowanego promptu, który zawiera instrukcję systemową, zapytanie użytkownika oraz opis oczekiwanego schematu JSON.
 - **Parametry:**
-    - `systemPrompt` (string): Instrukcja systemowa.
-    - `userPrompt` (string): Zapytanie użytkownika.
-    - `schema` (z.ZodTypeAny): Schemat Zod do konwersji na schemat JSON i dołączenia do promptu.
+  - `systemPrompt` (string): Instrukcja systemowa.
+  - `userPrompt` (string): Zapytanie użytkownika.
+  - `schema` (z.ZodTypeAny): Schemat Zod do konwersji na schemat JSON i dołączenia do promptu.
 - **Zwraca:** Pełny prompt w formie stringa.
 
 #### `private validateAndParseResponse(...)`
 
 - **Cel:** Parsowanie odpowiedzi tekstowej z API (która powinna być JSON-em) i walidacja jej względem podanego schematu Zod.
 - **Parametry:**
-    - `response` (string): Surowa odpowiedź tekstowa z modelu Gemini.
-    - `schema` (T extends z.ZodTypeAny): Schemat Zod do walidacji.
+  - `response` (string): Surowa odpowiedź tekstowa z modelu Gemini.
+  - `schema` (T extends z.ZodTypeAny): Schemat Zod do walidacji.
 - **Zwraca:** Sparsowany i zwalidowany obiekt.
 - **Rzuca błędy:** `InvalidResponseDataError`, jeśli odpowiedź nie jest poprawnym JSON-em lub nie jest zgodna ze schematem.
 
@@ -91,9 +93,9 @@ Ta funkcja będzie głównym punktem wejścia do generowania quizów w trybie ws
 
 - **Cel:** Wygenerowanie kompletnego quizu (tytuł + pytania z dystraktorami) na podstawie listy fiszek.
 - **Parametry:**
-    - `flashcards` (Flashcard[]): Tablica obiektów zawierających `question` i `answer`.
-    - `topic` (string): Temat quizu, na podstawie którego AI może wygenerować tytuł.
-    - `generationConfig` (object, opcjonalnie): Konfiguracja dla modelu (np. `temperature`).
+  - `flashcards` (Flashcard[]): Tablica obiektów zawierających `question` i `answer`.
+  - `topic` (string): Temat quizu, na podstawie którego AI może wygenerować tytuł.
+  - `generationConfig` (object, opcjonalnie): Konfiguracja dla modelu (np. `temperature`).
 - **Zwraca:** `Promise<GeneratedQuiz>` - Obiekt z tytułem i listą pytań zgodny ze zdefiniowanym schematem Zod.
 
 ## 5. Obsługa błędów
@@ -149,6 +151,7 @@ export class ContentBlockedError extends BaseError {}
 3.  Zdefiniuj schematy Zod i typy dla przetwarzania wsadowego. Umieść je w `src/lib/validators/ai.validator.ts`.
 
 **Schematy walidacji (`ai.validator.ts`):**
+
 ```typescript
 import { z } from "zod";
 
@@ -169,15 +172,13 @@ export const GeneratedQuizSchema = z.object({
 4.  Zaimplementuj publiczną funkcję `generateQuizFromFlashcards`.
 
 **Implementacja `generateQuizFromFlashcards` (`ai.service.ts`):**
+
 ```typescript
 import { geminiService } from "./ai.service";
 import { GeneratedQuizSchema } from "../validators/ai.validator";
 import type { Flashcard } from "@/types"; // Zakładając, że typ Flashcard jest zdefiniowany globalnie
 
-export async function generateQuizFromFlashcards(
-  flashcards: Flashcard[],
-  topic: string
-) {
+export async function generateQuizFromFlashcards(flashcards: Flashcard[], topic: string) {
   const systemPrompt = `Jesteś ekspertem w tworzeniu quizów wielokrotnego wyboru. Twoim zadaniem jest wygenerowanie kompletnego quizu na podstawie dostarczonej listy fiszek.
 Każda fiszka zawiera pytanie i poprawną odpowiedź. Dla każdego pytania musisz stworzyć 3 wiarygodne, ale nieprawidłowe odpowiedzi (dystraktory).
 Dystraktory powinny być tematycznie powiązane z pytaniem, podobnej długości i formatu co poprawna odpowiedź.
@@ -188,15 +189,11 @@ Na podstawie tematu i treści fiszek, stwórz również zwięzły, chwytliwy tyt
 
     Na podstawie poniższej listy fiszek, wygeneruj kompletny quiz.
     Fiszki:
-    ${flashcards.map((f, i) => `${i + 1}. Pytanie: "${f.question}", Poprawna odpowiedź: "${f.answer}"`).join('\n')}
+    ${flashcards.map((f, i) => `${i + 1}. Pytanie: "${f.question}", Poprawna odpowiedź: "${f.answer}"`).join("\n")}
   `;
 
   try {
-    const quizData = await geminiService.generateStructuredData(
-      systemPrompt,
-      userPrompt,
-      GeneratedQuizSchema
-    );
+    const quizData = await geminiService.generateStructuredData(systemPrompt, userPrompt, GeneratedQuizSchema);
     return quizData;
   } catch (error) {
     // Logowanie i ponowne rzucenie błędu

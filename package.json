@@ -1,9 +1,10 @@
 {
   "name": "quizcards",
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "scripts": {
     "dev": "astro dev",
+    "dev:e2e": "astro dev --mode test",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
@@ -20,7 +21,10 @@
     "test:delete:question": "tsx src/test/test-delete-question.ts",
     "test:regenerate:answers": "tsx src/test/test-regenerate-answers.ts",
     "test:patch:answers:id": "tsx src/test/test-patch-answers-id.ts",
-    "test:api": "tsx src/test/run-all-tests.ts"
+    "test:api": "tsx src/test/run-all-tests.ts",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest --watch",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@astrojs/node": "^9.4.3",
@@ -42,6 +46,7 @@
     "astro": "^5.13.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
     "lucide-react": "^0.487.0",
     "playwright": "^1.56.1",
     "react": "^19.1.1",
@@ -56,8 +61,12 @@
   "devDependencies": {
     "@eslint/compat": "1.2.7",
     "@eslint/js": "9.23.0",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.5.2",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "8.28.0",
+    "@vitest/coverage-v8": "^4.0.17",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "10.1.1",
     "eslint-import-resolver-typescript": "4.2.5",
@@ -69,11 +78,13 @@
     "eslint-plugin-react-compiler": "19.0.0-beta-aeaed83-20250323",
     "eslint-plugin-react-hooks": "5.2.0",
     "husky": "9.1.7",
+    "jsdom": "^24.0.0",
     "lint-staged": "15.5.0",
     "prettier-plugin-astro": "0.14.1",
     "supabase": "^2.51.0",
     "tsx": "^4.19.2",
-    "typescript-eslint": "8.28.0"
+    "typescript-eslint": "8.28.0",
+    "vitest": "^4.0.16"
   },
   "lint-staged": {
     "*.{ts,tsx,astro}": [

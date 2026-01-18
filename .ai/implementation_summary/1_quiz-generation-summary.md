@@ -142,20 +142,20 @@ ErrorResponse {
 
 ### Plan wdrożenia vs. Implementacja
 
-| Wymaganie planu                 | Status | Uwagi                          |
-| ------------------------------- | ------ | ------------------------------ |
-| Metoda POST                     | ✅     | Zaimplementowano               |
-| Endpoint /api/quizzes/generate  | ✅     | Zaimplementowano               |
-| Walidacja source_url            | ✅     | Zod schema + URL validation    |
-| Walidacja title (1-200)         | ✅     | Opcjonalne pole                |
-| CreateQuizCommand               | ✅     | Typ z types.ts                 |
-| QuizSummaryDTO                  | ✅     | Typ z types.ts                 |
-| Pobieranie danych Quizlet       | ✅     | Mock service                   |
-| Generacja AI                    | ✅     | Mock service                   |
-| Zapis do bazy danych            | ✅     | INSERT + transakcje            |
-| Kody 201, 400, 403, 404, 422, 500 | ✅     | Wszystkie obsłużone            |
-| Logowanie błędów                | ✅     | Console logging (TODO: service) |
-| Testy                           | ✅     | 9 testów                       |
+| Wymaganie planu                   | Status | Uwagi                           |
+| --------------------------------- | ------ | ------------------------------- |
+| Metoda POST                       | ✅     | Zaimplementowano                |
+| Endpoint /api/quizzes/generate    | ✅     | Zaimplementowano                |
+| Walidacja source_url              | ✅     | Zod schema + URL validation     |
+| Walidacja title (1-200)           | ✅     | Opcjonalne pole                 |
+| CreateQuizCommand                 | ✅     | Typ z types.ts                  |
+| QuizSummaryDTO                    | ✅     | Typ z types.ts                  |
+| Pobieranie danych Quizlet         | ✅     | Mock service                    |
+| Generacja AI                      | ✅     | Mock service                    |
+| Zapis do bazy danych              | ✅     | INSERT + transakcje             |
+| Kody 201, 400, 403, 404, 422, 500 | ✅     | Wszystkie obsłużone             |
+| Logowanie błędów                  | ✅     | Console logging (TODO: service) |
+| Testy                             | ✅     | 9 testów                        |
 
 ## 🚀 Uruchamianie testów
 

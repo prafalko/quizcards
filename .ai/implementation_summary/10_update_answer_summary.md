@@ -138,20 +138,20 @@ ErrorResponse {
 
 ### Plan wdrożenia vs. Implementacja
 
-| Wymaganie planu              | Status | Uwagi                      |
-| ---------------------------- | ------ | -------------------------- |
-| Metoda PATCH                 | ✅     | Zaimplementowano           |
-| Endpoint /api/answers/:id    | ✅     | Zaimplementowano           |
-| Walidacja UUID               | ✅     | validateId()               |
-| Walidacja answer_text (1-512)| ✅     | Zod schema + trim          |
-| UpdateAnswerCommand          | ✅     | Typ z types.ts             |
-| AnswerDTO                    | ✅     | Typ z types.ts             |
-| IDOR Protection              | ✅     | Filter przez relacje       |
-| Source change ai→ai-edited   | ✅     | Warunkowa aktualizacja     |
-| Kody 200, 400, 404, 500      | ✅     | Wszystkie obsłużone        |
-| LoggerService                | ✅     | Pełne logowanie            |
-| Correlation ID               | ✅     | W nagłówkach               |
-| Testy                        | ✅     | 9 testów                   |
+| Wymaganie planu               | Status | Uwagi                  |
+| ----------------------------- | ------ | ---------------------- |
+| Metoda PATCH                  | ✅     | Zaimplementowano       |
+| Endpoint /api/answers/:id     | ✅     | Zaimplementowano       |
+| Walidacja UUID                | ✅     | validateId()           |
+| Walidacja answer_text (1-512) | ✅     | Zod schema + trim      |
+| UpdateAnswerCommand           | ✅     | Typ z types.ts         |
+| AnswerDTO                     | ✅     | Typ z types.ts         |
+| IDOR Protection               | ✅     | Filter przez relacje   |
+| Source change ai→ai-edited    | ✅     | Warunkowa aktualizacja |
+| Kody 200, 400, 404, 500       | ✅     | Wszystkie obsłużone    |
+| LoggerService                 | ✅     | Pełne logowanie        |
+| Correlation ID                | ✅     | W nagłówkach           |
+| Testy                         | ✅     | 9 testów               |
 
 ## 🚀 Uruchamianie testów
 

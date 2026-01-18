@@ -19,7 +19,7 @@ export function QuizList({ quizzes, onDelete }: QuizListProps) {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-testid="quiz-list">
       {quizzes.map((quiz) => (
         <QuizCard key={quiz.id} quiz={quiz} onDelete={onDelete} />
       ))}

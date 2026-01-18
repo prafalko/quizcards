@@ -6,7 +6,6 @@ import { validateGenerateQuizCommand } from "../../../lib/validators/quiz.valida
 import { extractQuizletSetId } from "../../../lib/services/quizlet.service";
 import { createApiRoute } from "../../../lib/api-handler";
 import { ValidationError } from "../../../lib/errors";
-import { QuizletScraperFailedError } from "../../../lib/errors";
 
 export const prerender = false;
 

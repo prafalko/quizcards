@@ -20,8 +20,6 @@ const baseConfig = tseslint.config({
   rules: {
     "no-console": "warn",
     "no-unused-vars": "off",
-    "prettier/prettier": ["error", { endOfLine: "crlf" }],
-    "no-multiple-empty-lines": ["error", { max: 1, maxBOF: 0, maxEOF: 1 }],
   },
 });
 

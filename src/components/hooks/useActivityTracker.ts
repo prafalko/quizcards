@@ -1,10 +1,5 @@
 import { useEffect, useRef } from "react";
-import {
-  updateLastActivity,
-  shouldLogoutDueToInactivity,
-  clearActivity,
-  getInactivityTimeout,
-} from "../../lib/activity-tracker";
+import { updateLastActivity, shouldLogoutDueToInactivity, clearActivity } from "../../lib/activity-tracker";
 
 /**
  * Hook to track user activity and automatically logout after inactivity

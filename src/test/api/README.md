@@ -172,11 +172,13 @@ npm run test:patch:question
 ---
 
 #### 8. DELETE /api/questions/:id - Delete Question
+
 ```bash
 npm run test:delete:question
 ```
 
 **Tests:**
+
 - ✅ Successful question deletion (204)
 - ❌ Invalid UUID format (400)
 - ❌ Non-existent question ID (404)
@@ -292,6 +294,7 @@ PATCH /api/answers/:id:
 ```
 
 This summary makes it easy to:
+
 - See overall test health at a glance
 - Identify which endpoints have issues
 - Quickly locate failed tests without scrolling through logs

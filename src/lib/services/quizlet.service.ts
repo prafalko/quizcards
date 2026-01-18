@@ -170,7 +170,7 @@ async function _fetchQuizletData(setId: string): Promise<QuizletApiResponse> {
     const quizletPageUrl = `https://quizlet.com/${setId}`;
     const navigationResponse = await page.goto(quizletPageUrl, {
       waitUntil: "networkidle",
-      timeout: 10000,
+      timeout: 1000,
     });
 
     // Check if page loaded successfully
@@ -204,7 +204,7 @@ async function _fetchQuizletData(setId: string): Promise<QuizletApiResponse> {
     // If API call wasn't intercepted, try direct API call through the browser
     const response = await page.goto(apiUrl, {
       waitUntil: "networkidle",
-      timeout: 10000,
+      timeout: 1000,
     });
 
     if (!response) {

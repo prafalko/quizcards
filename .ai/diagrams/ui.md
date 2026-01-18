@@ -4,16 +4,19 @@ Na podstawie dostarczonej dokumentacji oraz analizy kodu, zidentyfikowano nastę
 ### 1. Komponenty, Strony i Layouty
 
 **Strony (Astro - `src/pages`)**
+
 - `login.astro`: Strona logowania, renderuje komponent `LoginForm`.
 - `register.astro`: Strona rejestracji, renderuje komponent `RegisterForm`.
 - `recover.astro`: Strona odzyskiwania konta, renderuje `RecoverAccountForm`.
 - `index.astro`: Główna strona aplikacji, która przekierowuje do `/login` jeśli użytkownik nie jest zalogowany.
 
 **Layouty (Astro - `src/layouts`)**
+
 - `AuthLayout.astro`: Specjalny, minimalistyczny layout dla stron uwierzytelniania (`login`, `register`, `recover`).
 - `Layout.astro`: Główny layout aplikacji, który po zalogowaniu wyświetla dane użytkownika i przycisk wylogowania.
 
 **Komponenty (React - `src/components/auth`)**
+
 - `LoginForm.tsx`: Interaktywny formularz logowania z walidacją, obsługą stanu i komunikacją z API.
 - `RegisterForm.tsx`: Interaktywny formularz rejestracji z walidacją, obsługą stanu i komunikacją z API.
 - `RecoverAccountForm.tsx`: Formularz do odzyskiwania hasła.
@@ -21,9 +24,11 @@ Na podstawie dostarczonej dokumentacji oraz analizy kodu, zidentyfikowano nastę
 - `LogoutButton.tsx` (Planowany): Przycisk do wylogowania użytkownika.
 
 **Middleware (`src/middleware/index.ts`)**
+
 - `Middleware`: Centralny punkt kontroli dostępu. Weryfikuje sesję użytkownika przy każdym żądaniu, chroni trasy i przekierowuje użytkowników w zależności od ich statusu zalogowania.
 
 **API Endpoints (`src/pages/api/auth`)**
+
 - `login.ts`: Endpoint backendowy, który obsługuje logikę logowania po stronie serwera, komunikując się z Supabase.
 
 ### 2. Przepływ Danych
@@ -50,6 +55,7 @@ Na podstawie dostarczonej dokumentacji oraz analizy kodu, zidentyfikowano nastę
 </architecture_analysis>
 
 <mermaid_diagram>
+
 ```mermaid
 flowchart TD
     subgraph "Użytkownik Niezalogowany"
@@ -62,10 +68,10 @@ flowchart TD
     subgraph "Strony Uwierzytelniania (Astro)"
         P_LOGIN -- Używa --> L_AUTH[Layout: AuthLayout.astro]
         P_LOGIN -- Renderuje --> C_LOGIN_FORM[Komponent: LoginForm.tsx]
-        
+
         P_REGISTER[Strona: register.astro] -- Używa --> L_AUTH
         P_REGISTER -- Renderuje --> C_REGISTER_FORM[Komponent: RegisterForm.tsx]
-        
+
         P_RECOVER[Strona: recover.astro] -- Używa --> L_AUTH
         P_RECOVER -- Renderuje --> C_RECOVER_FORM[Komponent: RecoverAccountForm.tsx]
     end
@@ -73,10 +79,10 @@ flowchart TD
     subgraph "Interaktywne Formularze (React)"
         C_LOGIN_FORM -- Wprowadza dane --> V_CLIENT[Walidacja klienta (zod)]
         V_CLIENT -- OK --> FETCH_LOGIN[POST /api/auth/login]
-        
+
         C_REGISTER_FORM -- Wprowadza dane --> V_CLIENT_REG[Walidacja klienta (zod)]
         V_CLIENT_REG -- OK --> FETCH_REGISTER[POST /api/auth/register]
-        
+
         FETCH_LOGIN -- Wyświetla błąd/sukces --> C_AUTH_MSG[Komponent: AuthFormMessage.tsx]
         FETCH_REGISTER -- Wyświetla błąd/sukces --> C_AUTH_MSG
         C_RECOVER_FORM
@@ -85,11 +91,11 @@ flowchart TD
     subgraph "Backend Aplikacji (Astro API)"
         FETCH_LOGIN --> API_LOGIN[Endpoint: login.ts]
         FETCH_REGISTER --> API_REGISTER[Endpoint: register.ts]
-        
+
         API_LOGIN -- Wywołuje --> S_AUTH_SIGNIN[Supabase Auth: signInWithPassword]
         API_REGISTER -- Wywołuje --> S_AUTH_SIGNUP[Supabase Auth: signUp]
     end
-    
+
     subgraph "Usługa Zewnętrzna"
         S_AUTH_SIGNIN <--> SUPABASE[Supabase]
         S_AUTH_SIGNUP <--> SUPABASE
@@ -100,14 +106,14 @@ flowchart TD
         S_AUTH_SIGNIN -- Sukces --> SET_COOKIE[Ustawienie sesji (cookie)]
         SET_COOKIE --> REDIRECT_HOME[Przekierowanie do /]
         REDIRECT_HOME --> P_HOME[Strona: index.astro]
-        
+
         P_HOME -- Żądanie --> MW_CHECK_SESSION{Middleware: Jest sesja?}
         MW_CHECK_SESSION -- Tak --> RENDER_PAGE[Renderuj stronę]
         RENDER_PAGE --> L_MAIN[Layout: Layout.astro]
         L_MAIN -- Renderuje --> C_DASHBOARD[Komponent: Dashboard.tsx]
         L_MAIN -- Wyświetla --> C_LOGOUT[Komponent: LogoutButton.tsx]
     end
-    
+
     classDef astro fill:#FF5E00,stroke:#333,stroke-width:2px,color:#fff;
     classDef react fill:#61DAFB,stroke:#333,stroke-width:2px,color:#000;
     classDef middleware fill:#F7DF1E,stroke:#333,stroke-width:2px,color:#000;
@@ -120,4 +126,5 @@ flowchart TD
     class API_LOGIN,API_REGISTER api;
     class S_AUTH_SIGNIN,S_AUTH_SIGNUP,SUPABASE supabase;
 ```
+
 </mermaid_diagram>
