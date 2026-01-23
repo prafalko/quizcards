@@ -59,11 +59,17 @@ Environment variables (e.g. Supabase keys, Gemini API key) should be placed in a
 | `npm run lint`     | Run ESLint over the codebase           |
 | `npm run lint:fix` | Run ESLint with `--fix`                |
 | `npm run format`   | Format code with Prettier              |
-| `npm run test:api` | Run (all) manual tests scripts         |
+| `npm run test:unit` | Run Vitest unit suites                 |
 
-### Manual API Tests
+## Running Unit Tests
 
-The project includes manual test scripts for verifying API endpoint functionality during development. See [src/test/README.md](src/test/README.md) for detailed testing instructions and documentation.
+Unit tests are implemented with Vitest under `src/test/unit/`. To execute the suite that covers `useQuizResults`, run:
+
+```bash
+npm run test:unit -- src/test/unit/useQuizResults.test.ts
+```
+
+Use `npm run test:unit:watch` if you need to rerun the tests automatically while editing.
 
 ## Project Scope
 
@@ -86,7 +92,7 @@ Out-of-scope for MVP:
 
 ## Project Status
 
-![version](https://img.shields.io/badge/version-0.4.0-blue?style=flat-square)
+![version](https://img.shields.io/badge/version-1.0.1-blue?style=flat-square)
 
 The project is in active **MVP development** — core features are being built and are not yet production-ready. Contributions are welcome via Pull Requests.
 

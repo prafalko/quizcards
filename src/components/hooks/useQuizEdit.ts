@@ -54,58 +54,16 @@ interface UseQuizEditReturn {
 
 export function useQuizEdit(initialQuiz: QuizDetailDTO): UseQuizEditReturn {
   const [quiz, setQuiz] = useState<QuizDetailDTO>(initialQuiz);
-
   const [originalQuiz, setOriginalQuiz] = useState<QuizDetailDTO>(initialQuiz);
-
   const [isSaving, setIsSaving] = useState(false);
-
   const [isRegenerating, setIsRegenerating] = useState<string | null>(null);
-
   const [questionToDeleteId, setQuestionToDeleteId] = useState<string | null>(null);
-
   const [saveError, setSaveError] = useState<string | null>(null);
-
   const [deleteError, setDeleteError] = useState<string | null>(null);
-
   const [regenerateError, setRegenerateError] = useState<string | null>(null);
-
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Check if there are unsaved changes by comparing key properties
-
-  const isDirty =
-    hasChanges ||
-    (() => {
-      // Compare title
-
-      if (quiz.title !== originalQuiz.title) return true;
-
-      // Compare questions count
-
-      if (quiz.questions.length !== originalQuiz.questions.length) return true;
-
-      // Compare each question and its answers
-
-      for (const question of quiz.questions) {
-        const originalQuestion = originalQuiz.questions.find((q) => q.id === question.id);
-
-        if (!originalQuestion) return true; // New question
-
-        if (question.question_text !== originalQuestion.question_text) return true;
-
-        // Compare answers
-
-        if (question.answers.length !== originalQuestion.answers.length) return true;
-
-        for (const answer of question.answers) {
-          const originalAnswer = originalQuestion.answers.find((a) => a.id === answer.id);
-
-          if (!originalAnswer || answer.answer_text !== originalAnswer.answer_text) return true;
-        }
-      }
-
-      return false;
-    })();
+  const isDirty = hasChanges || hasQuizChanged(quiz, originalQuiz);
 
   const updateTitle = useCallback((newTitle: string) => {
     setQuiz((prev) => ({ ...prev, title: newTitle }));
@@ -412,39 +370,41 @@ export function useQuizEdit(initialQuiz: QuizDetailDTO): UseQuizEditReturn {
 
   return {
     quiz,
-
     originalQuiz,
-
     isDirty,
-
     isSaving,
-
     isRegenerating,
-
     questionToDeleteId,
-
     saveError,
-
     deleteError,
-
     regenerateError,
-
     updateTitle,
-
     updateQuestion,
-
     updateAnswer,
-
     handleSaveChanges,
-
     handleDiscardChanges,
-
     handleDeleteQuestionRequest,
-
     handleConfirmDeleteQuestion,
-
     handleCancelDeleteQuestion,
-
     handleRegenerateAnswers,
   };
+}
+
+function hasQuizChanged(current: QuizDetailDTO, original: QuizDetailDTO): boolean {
+  if (current.title !== original.title) return true;
+  if (current.questions.length !== original.questions.length) return true;
+
+  for (const question of current.questions) {
+    const originalQuestion = original.questions.find((q) => q.id === question.id);
+    if (!originalQuestion) return true;
+    if (question.question_text !== originalQuestion.question_text) return true;
+    if (question.answers.length !== originalQuestion.answers.length) return true;
+
+    for (const answer of question.answers) {
+      const originalAnswer = originalQuestion.answers.find((a) => a.id === answer.id);
+      if (!originalAnswer || answer.answer_text !== originalAnswer.answer_text) return true;
+    }
+  }
+
+  return false;
 }
