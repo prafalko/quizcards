@@ -1,5 +1,5 @@
 import type { QuizListItemDTO } from "@/types";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -22,11 +22,6 @@ export function QuizCard({ quiz, onDelete }: QuizCardProps) {
           {quiz.question_count} {quiz.question_count === 1 ? "pytanie" : "pytań"}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="text-sm text-muted-foreground">
-          Status: <span className="capitalize">{quiz.status}</span>
-        </div>
-      </CardContent>
       <CardFooter className="gap-2 flex-wrap">
         {quiz.question_count === 0 ? (
           <Tooltip>
